@@ -315,3 +315,184 @@ def get_job_matches(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch matches",
         )
+
+
+@router.post("/jobs/{job_id}/save")
+def save_job(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Save a job to user's saved list."""
+    try:
+        # Get job
+        job = db.query(Job).filter(Job.jsearch_id == job_id).first()
+
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        # Check if already saved
+        existing_action = db.query(UserJobAction).filter(
+            UserJobAction.user_id == current_user.id,
+            UserJobAction.job_id == job.id,
+            UserJobAction.action == "saved",
+        ).first()
+
+        if existing_action:
+            return {"message": "Job already saved", "action": "saved", "job_id": job.id}
+
+        # Create action record
+        action = UserJobAction(
+            user_id=current_user.id,
+            job_id=job.id,
+            action="saved",
+        )
+        db.add(action)
+        db.commit()
+
+        logger.info(f"User {current_user.id} saved job {job_id}")
+
+        return {"message": "Job saved", "action": "saved", "job_id": job.id}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error saving job: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to save job",
+        )
+
+
+@router.post("/jobs/{job_id}/dismiss")
+def dismiss_job(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Dismiss a job (don't show similar matches)."""
+    try:
+        # Get job
+        job = db.query(Job).filter(Job.jsearch_id == job_id).first()
+
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        # Check if already dismissed
+        existing_action = db.query(UserJobAction).filter(
+            UserJobAction.user_id == current_user.id,
+            UserJobAction.job_id == job.id,
+            UserJobAction.action == "dismissed",
+        ).first()
+
+        if existing_action:
+            return {"message": "Job already dismissed", "action": "dismissed", "job_id": job.id}
+
+        # Remove from saved if exists
+        saved_action = db.query(UserJobAction).filter(
+            UserJobAction.user_id == current_user.id,
+            UserJobAction.job_id == job.id,
+            UserJobAction.action == "saved",
+        ).first()
+
+        if saved_action:
+            db.delete(saved_action)
+
+        # Create dismiss action
+        action = UserJobAction(
+            user_id=current_user.id,
+            job_id=job.id,
+            action="dismissed",
+        )
+        db.add(action)
+        db.commit()
+
+        logger.info(f"User {current_user.id} dismissed job {job_id}")
+
+        return {"message": "Job dismissed", "action": "dismissed", "job_id": job.id}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error dismissing job: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to dismiss job",
+        )
+
+
+@router.post("/jobs/{job_id}/apply")
+def apply_to_job(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Mark a job as applied and get apply link."""
+    try:
+        # Get job
+        job = db.query(Job).filter(Job.jsearch_id == job_id).first()
+
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        # Check if already applied
+        existing_action = db.query(UserJobAction).filter(
+            UserJobAction.user_id == current_user.id,
+            UserJobAction.job_id == job.id,
+            UserJobAction.action == "applied",
+        ).first()
+
+        if existing_action:
+            return {
+                "message": "Already marked as applied",
+                "action": "applied",
+                "job_id": job.id,
+                "apply_url": job.apply_url,
+            }
+
+        # Create apply action
+        action = UserJobAction(
+            user_id=current_user.id,
+            job_id=job.id,
+            action="applied",
+        )
+        db.add(action)
+
+        # Remove from dismissed if was dismissed
+        dismissed_action = db.query(UserJobAction).filter(
+            UserJobAction.user_id == current_user.id,
+            UserJobAction.job_id == job.id,
+            UserJobAction.action == "dismissed",
+        ).first()
+
+        if dismissed_action:
+            db.delete(dismissed_action)
+
+        db.commit()
+
+        logger.info(f"User {current_user.id} applied to job {job_id}")
+
+        return {
+            "message": "Job marked as applied",
+            "action": "applied",
+            "job_id": job.id,
+            "apply_url": job.apply_url,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error applying to job: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to apply to job",
+        )

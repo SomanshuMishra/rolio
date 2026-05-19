@@ -42,11 +42,13 @@ def health_check():
 
 
 # Include routers
-from .routers import resume, jobs
+from .routers import resume, jobs, profile, settings
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(resume.router, prefix="/api")
 app.include_router(jobs.router, prefix="/api")
+app.include_router(profile.router, prefix="/api")
+app.include_router(settings.router, prefix="/api")
 
 
 # Exception handlers
