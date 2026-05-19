@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit -m 'chore: project scaffolding and comprehensive documentation *)"
+      "Bash(git commit -m 'chore: project scaffolding and comprehensive documentation *)",
+      "Bash(git commit -m 'feat: backend setup with FastAPI, SQLAlchemy models, and JWT authentication *)"
     ]
   }
 }
