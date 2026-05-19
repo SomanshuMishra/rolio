@@ -15,19 +15,6 @@ class UserLogin(BaseModel):
     password: str
 
 
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-
-
-class AuthResponse(BaseModel):
-    user: "UserResponse"
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-
-
 class UserResponse(BaseModel):
     id: uuid.UUID
     email: str
@@ -38,6 +25,19 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class AuthResponse(BaseModel):
+    user: UserResponse
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
 
 
 class RefreshTokenRequest(BaseModel):

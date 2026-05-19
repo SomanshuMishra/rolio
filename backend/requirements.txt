@@ -36,6 +36,7 @@ cryptography==41.0.7
 # Utilities
 python-dotenv==1.0.0
 validators==0.22.0
+email-validator==2.1.0
 
 # Development
 pytest==7.4.3

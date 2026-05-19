@@ -7,8 +7,11 @@ from .config import settings
 from .database import Base, engine
 from .routers import auth
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+# Create tables (skip if database not available during startup)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Could not create tables: {e}. Database may not be available yet.")
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +42,10 @@ def health_check():
 
 
 # Include routers
+from .routers import resume
+
 app.include_router(auth.router, prefix="/api")
+app.include_router(resume.router, prefix="/api")
 
 
 # Exception handlers
