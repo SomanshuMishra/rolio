@@ -201,22 +201,33 @@ export default function JobsPage() {
   }
 
   const handleDownloadExcel = async () => {
-    if (!currentSearchId) return
+    if (!currentSearchId && !searchResults.length) return
 
     try {
       const token = localStorage.getItem('access_token')
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-      const response = await fetch(
-        `${apiUrl}/api/jobs/search-results/${currentSearchId}/export?min_score=${MIN_MATCH_SCORE}`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      )
+      // If currentSearchId is null (old cached matches), fetch all matches
+      let downloadUrl = ''
+      if (currentSearchId && currentSearchId !== 'cached') {
+        downloadUrl = `${apiUrl}/api/jobs/search-results/${currentSearchId}/export?min_score=${MIN_MATCH_SCORE}`
+      } else {
+        downloadUrl = `${apiUrl}/api/jobs/matches/export?limit=1000&min_score=${MIN_MATCH_SCORE}`
+      }
+
+      const response = await fetch(downloadUrl, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
 
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `rolio_job_matches_${currentSearchId?.slice(0, 8)}.xlsx`
+      a.download = `rolio_job_matches_${currentSearchId?.slice(0, 8) || 'all'}.xlsx`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
