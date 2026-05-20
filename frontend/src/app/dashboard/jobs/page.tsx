@@ -111,12 +111,17 @@ export default function JobsPage() {
 
           if (statusData.status === 'completed') {
             // Fetch results
-            const resultsResponse = await fetch(
-              `${apiUrl}/api/jobs/search-results/${searchId}?limit=50&min_score=${MIN_MATCH_SCORE}`,
-              { headers: { 'Authorization': `Bearer ${token}` } }
-            )
-            const resultsData = await resultsResponse.json()
-            setSearchResults(resultsData.matches || [])
+            try {
+              const resultsResponse = await fetch(
+                `${apiUrl}/api/jobs/search-results/${searchId}?limit=50&min_score=${MIN_MATCH_SCORE}`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
+              )
+              const resultsData = await resultsResponse.json()
+              console.log('Search results:', resultsData)
+              setSearchResults(resultsData.matches || [])
+            } catch (error) {
+              console.error('Failed to fetch results:', error)
+            }
 
             // Show notification
             if ('Notification' in window && Notification.permission === 'granted') {
