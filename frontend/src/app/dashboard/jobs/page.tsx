@@ -274,191 +274,240 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f7ff] text-[#0f172a] p-8">
+    <div className="min-h-screen text-[#4a4a5e] p-6 md:p-8">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="text-4xl font-bold mb-8">Job Search</h1>
+        {/* Hero Section */}
+        <div className="mb-12">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-6xl font-black mb-2 gradient-text"
+          >
+            Job Opportunities
+          </motion.h1>
+          <p className="text-lg text-gray-600">AI-matched roles tailored to your profile</p>
+        </div>
 
-        {/* Show accumulating message if search just started from settings redirect */}
+        {/* Accumulating Jobs Message */}
         <AnimatePresence>
           {searchInProgress && searchStatus?.status === 'pending' && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-xl p-12 mb-8 text-center"
+              className="mb-8 bg-gradient-to-br from-cyan-300/20 to-blue-300/20 border-2 border-cyan-300/50 rounded-2xl p-10 text-center backdrop-blur-sm"
             >
               <motion.div
-                animate={{ rotate: 360 }}
+                animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="w-12 h-12 border-3 border-blue-500/30 border-t-blue-500 rounded-full mx-auto mb-4"
-              />
-              <h2 className="text-2xl font-semibold mb-2">✨ Accumulating Jobs for You</h2>
-              <p className="text-gray-300">We're searching multiple job sources and matching them to your profile. You'll be notified when done.</p>
+                className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-400 to-blue-400 flex items-center justify-center"
+              >
+                <span className="text-2xl">✨</span>
+              </motion.div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Accumulating Jobs for You</h2>
+              <p className="text-gray-700">Searching multiple sources and matching with your profile...</p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Search Form - only show if no active search */}
+        {/* Action Section */}
         {!searchInProgress && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-8 mb-8"
+            className="mb-12"
           >
-            <h2 className="text-2xl font-semibold mb-6">Start New Search</h2>
-
             <motion.button
               onClick={handleStartSearch}
               disabled={searchInProgress}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-[#0f172a] rounded-lg font-bold flex items-center gap-3 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              whileHover={{ scale: 1.05 }}
+              className="w-full md:w-auto px-8 py-5 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-2xl transition-all disabled:opacity-50"
+              whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(244, 114, 182, 0.3)' }}
               whileTap={{ scale: 0.95 }}
             >
-              🔍 Find Jobs
+              <span className="text-2xl">🔍</span> Find Jobs Now
             </motion.button>
           </motion.div>
         )}
 
-        {/* Search Status */}
+        {/* Status Cards Section */}
         <AnimatePresence>
           {searchStatus && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-8 mb-8"
+              className="mb-12"
             >
-              <h3 className="text-xl font-semibold mb-4">Search Status</h3>
-
               {searchStatus.status === 'pending' && (
-                <div className="flex items-center gap-3 text-yellow-400">
-                  <div className="animate-spin w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full" />
-                  <span>Initializing search...</span>
-                </div>
+                <motion.div
+                  className="bg-gradient-to-br from-yellow-300/30 to-amber-300/30 border-2 border-yellow-300/50 rounded-2xl p-8 flex items-center gap-4"
+                  animate={{ boxShadow: '0 0 20px rgba(253, 224, 71, 0.2)' }}
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-8 h-8 border-3 border-yellow-400 border-t-transparent rounded-full flex-shrink-0"
+                  />
+                  <span className="text-gray-900 font-semibold">Initializing search...</span>
+                </motion.div>
               )}
 
               {searchStatus.status === 'in_progress' && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 text-blue-400">
-                    <div className="animate-spin w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full" />
-                    <span>Searching jobs from multiple sources...</span>
+                <div className="space-y-4">
+                  <motion.div
+                    className="bg-gradient-to-br from-blue-300/30 to-cyan-300/30 border-2 border-blue-300/50 rounded-2xl p-8 flex items-center gap-4"
+                    animate={{ boxShadow: '0 0 20px rgba(59, 130, 246, 0.2)' }}
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="w-8 h-8 border-3 border-blue-400 border-t-transparent rounded-full flex-shrink-0"
+                    />
+                    <span className="text-gray-900 font-semibold">Searching jobs from multiple sources...</span>
+                  </motion.div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <motion.div className="bg-gradient-to-br from-orange-300/30 to-yellow-300/30 border-2 border-orange-300/50 rounded-2xl p-6">
+                      <p className="text-sm text-gray-600 mb-1">Total Jobs Searched</p>
+                      <p className="text-4xl font-black text-orange-600">{searchStatus.total_jobs_searched}</p>
+                    </motion.div>
+                    <motion.div className="bg-gradient-to-br from-green-300/30 to-emerald-300/30 border-2 border-green-300/50 rounded-2xl p-6">
+                      <p className="text-sm text-gray-600 mb-1">Matches Found</p>
+                      <p className="text-4xl font-black text-green-600">{searchStatus.total_matches}</p>
+                    </motion.div>
                   </div>
-                  <p className="text-gray-600 text-sm">
-                    Jobs found: {searchStatus.total_jobs_searched} • Matching: {searchStatus.total_matches}
-                  </p>
                 </div>
               )}
 
               {searchStatus.status === 'completed' && (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-green-400">
-                    <span className="text-2xl">✓</span>
-                    <span>Search completed successfully!</span>
+                  <motion.div
+                    className="bg-gradient-to-br from-emerald-400/30 to-green-400/30 border-2 border-emerald-400/50 rounded-2xl p-8 flex items-center gap-4"
+                    animate={{ boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' }}
+                  >
+                    <span className="text-4xl">✓</span>
+                    <div>
+                      <p className="text-lg font-bold text-gray-900">Search Completed!</p>
+                      <p className="text-sm text-gray-700">Your job matches are ready</p>
+                    </div>
+                  </motion.div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <motion.div className="bg-gradient-to-br from-blue-300/30 to-purple-300/30 border-2 border-blue-300/50 rounded-2xl p-6">
+                      <p className="text-sm text-gray-600 mb-1">Total Searched</p>
+                      <p className="text-4xl font-black text-blue-600">{searchStatus.total_jobs_searched}</p>
+                    </motion.div>
+                    <motion.div className="bg-gradient-to-br from-pink-300/30 to-rose-300/30 border-2 border-pink-300/50 rounded-2xl p-6">
+                      <p className="text-sm text-gray-600 mb-1">Qualified Matches</p>
+                      <p className="text-4xl font-black text-pink-600">{searchStatus.total_matches}</p>
+                    </motion.div>
                   </div>
-                  <div className="bg-white rounded p-4 space-y-2">
-                    <p className="text-sm text-gray-300">
-                      Total jobs searched: <span className="font-bold text-[#0f172a]">{searchStatus.total_jobs_searched}</span>
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      Matches found (≥60%): <span className="font-bold text-[#0f172a]">{searchStatus.total_matches}</span>
-                    </p>
-                  </div>
-
                   {searchResults.length > 0 && (
                     <motion.button
                       onClick={handleDownloadExcel}
-                      className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
+                      className="w-full py-3 px-6 bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg"
                       whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      📥 Download Excel (.xlsx)
+                      📥 Download All Results (Excel)
                     </motion.button>
                   )}
                 </div>
               )}
 
               {searchStatus.status === 'failed' && (
-                <div className="flex items-center gap-3 text-red-400">
-                  <span className="text-2xl">✗</span>
-                  <span>Search failed. Please try again.</span>
-                </div>
+                <motion.div className="bg-gradient-to-br from-red-300/30 to-rose-300/30 border-2 border-red-300/50 rounded-2xl p-8 flex items-center gap-4">
+                  <span className="text-4xl">✗</span>
+                  <span className="text-gray-900 font-semibold">Search failed. Please try again.</span>
+                </motion.div>
               )}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Search Results */}
+        {/* Job Results Grid */}
         <AnimatePresence>
           {searchStatus?.status === 'completed' && searchResults.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <h2 className="text-2xl font-semibold mb-4">
-                Matched Jobs ({searchResults.length})
-              </h2>
+              <div>
+                <h2 className="text-4xl font-black mb-2 gradient-text">
+                  {searchResults.length} Opportunities
+                </h2>
+                <p className="text-gray-600">Click to flip and see why you match</p>
+              </div>
 
-              {searchResults.map((match, index) => (
-                <motion.div
-                  key={match.match_id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-2">{match.job.title}</h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                        <span>{match.job.company}</span>
-                        <span>📍 {match.job.location}</span>
-                        {match.job.is_remote && <span className="text-green-400">🌍 Remote</span>}
-                      </div>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {searchResults.map((match, index) => {
+                  const scoreColor = match.match_score >= 75 ? 'from-emerald-400 to-green-400' :
+                                    match.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
+                                    'from-red-400 to-rose-400'
+                  const borderColor = match.match_score >= 75 ? 'border-emerald-300' :
+                                     match.match_score >= 60 ? 'border-amber-300' :
+                                     'border-red-300'
 
-                    <div className="text-right">
-                      <div className="text-4xl font-black text-green-400">{Math.round(match.match_score)}%</div>
-                      <div className="text-xs text-gray-600">Match Score</div>
-                    </div>
-                  </div>
-
-                  {match.match_reasons.length > 0 && (
-                    <div className="mb-4 p-3 bg-white rounded">
-                      <p className="text-xs text-gray-600 mb-2">Why matched:</p>
-                      <ul className="space-y-1">
-                        {match.match_reasons.slice(0, 3).map((reason, i) => (
-                          <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
-                            <span className="text-green-400 mt-0.5">✓</span>
-                            <span>{reason}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {match.job.salary_min && (
-                    <p className="text-sm text-gray-600 mb-4">
-                      💰 ${match.job.salary_min.toLocaleString()} - ${match.job.salary_max?.toLocaleString()}
-                    </p>
-                  )}
-
-                  <div className="flex gap-2">
-                    <motion.a
-                      href={match.job.apply_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium text-center"
-                      whileHover={{ scale: 1.02 }}
+                  return (
+                    <motion.div
+                      key={match.match_id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className={`h-80 rounded-2xl border-2 ${borderColor} bg-white hover:shadow-xl transition-all cursor-pointer overflow-hidden`}
                     >
-                      Apply Now →
-                    </motion.a>
-                  </div>
-                </motion.div>
-              ))}
+                      <div className="h-full p-6 flex flex-col">
+                        {/* Match Score Badge */}
+                        <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${scoreColor} flex items-center justify-center mb-4 mx-auto shadow-lg`}>
+                          <div className="text-center">
+                            <p className="text-2xl font-black text-white">{Math.round(match.match_score)}</p>
+                            <p className="text-xs font-bold text-white">match</p>
+                          </div>
+                        </div>
+
+                        {/* Job Info */}
+                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-center">{match.job.title}</h3>
+                        <p className="text-sm text-purple-600 font-semibold text-center mb-3">{match.job.company}</p>
+
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-2 mb-4 justify-center">
+                          <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
+                            📍 {match.job.location}
+                          </span>
+                          {match.job.is_remote && (
+                            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">
+                              🌍 Remote
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Salary */}
+                        {match.job.salary_min && (
+                          <p className="text-sm text-gray-600 text-center mb-auto">
+                            💰 ${(match.job.salary_min / 1000).toFixed(0)}K - ${(match.job.salary_max! / 1000).toFixed(0)}K
+                          </p>
+                        )}
+
+                        {/* Apply Button */}
+                        <motion.a
+                          href={match.job.apply_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-2 px-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg text-sm font-bold text-center mt-4 hover:shadow-lg transition-all"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Apply Now →
+                        </motion.a>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -467,11 +516,13 @@ export default function JobsPage() {
         <AnimatePresence>
           {searchStatus?.status === 'completed' && searchResults.length === 0 && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-20"
             >
-              <p className="text-xl text-gray-600">No jobs matched your criteria. Try adjusting your preferences.</p>
+              <p className="text-5xl mb-4">🔍</p>
+              <p className="text-2xl font-bold text-gray-900 mb-2">No Matches Yet</p>
+              <p className="text-gray-600 text-lg">Try adjusting your preferences in settings</p>
             </motion.div>
           )}
         </AnimatePresence>
