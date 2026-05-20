@@ -1,0 +1,51 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy Rolio to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            # Source NVM for Node.js
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            cd /home/ubuntu/auto-apply-jobs
+
+            echo "Pulling latest code..."
+            git pull origin main
+
+            # Deploy Backend
+            echo "Deploying backend..."
+            cd backend
+            source venv/bin/activate
+            pip install -r requirements.txt --quiet
+            deactivate
+            pm2 restart rolio-backend --wait-ready --listen-timeout 10000
+
+            # Deploy Frontend
+            echo "Deploying frontend..."
+            cd ../frontend
+            npm ci --quiet
+            NEXT_PUBLIC_API_URL=https://api.rolio.in npm run build
+            pm2 restart rolio-frontend --wait-ready --listen-timeout 10000
+
+            # Verify
+            echo "Deployment complete!"
+            pm2 status
