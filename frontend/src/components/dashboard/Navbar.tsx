@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSidebar } from '@/contexts/SidebarContext'
+import MobileNav from './MobileNav'
 
 interface NavbarProps {
   userName?: string
@@ -43,6 +44,11 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
       transition={{ duration: 0.4 }}
     >
       <div className="px-4 md:px-8 py-4 flex items-center justify-between">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <MobileNav />
+        </div>
+
         {/* Left side - Search (hidden on mobile) */}
         <motion.div
           className="flex-1 max-w-sm hidden md:block"
@@ -62,7 +68,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
 
         {/* Right side - User menu */}
         <motion.div
-          className="flex items-center gap-4 ml-8"
+          className="flex items-center gap-4 ml-auto md:ml-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
