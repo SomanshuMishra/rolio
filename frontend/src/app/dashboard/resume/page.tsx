@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/Toast'
+import ScanBeam from '@/components/ui/ScanBeam'
 
 interface ParsedResume {
   name?: string
@@ -26,7 +27,9 @@ export default function ResumePage() {
   const [parsedData, setParsedData] = useState<ParsedResume | null>(null)
   const [uploadError, setUploadError] = useState('')
   const [isConfirming, setIsConfirming] = useState(false)
+  const [isScanActive, setIsScanActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -91,7 +94,10 @@ export default function ResumePage() {
       }
 
       const data = await response.json()
-      setParsedData(data.parsed_data || {})
+      setIsScanActive(true)
+      setTimeout(() => {
+        setParsedData(data.parsed_data || {})
+      }, 1500)
       addToast('Resume uploaded successfully!', 'success')
     } catch (error) {
       setUploadError('An error occurred while uploading the resume')
@@ -127,18 +133,18 @@ export default function ResumePage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="text-4xl font-bold mb-2">Your Resume</h1>
-        <p className="text-gray-600">Upload and manage your resume for job matching</p>
+        <h1 className="text-4xl font-bold mb-2 ai-text">Your Resume</h1>
+        <p className="text-slate-400">Upload and manage your resume for job matching</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Upload Section */}
         <div className="lg:col-span-1">
           <motion.div
-            className={`border-2 border-dashed rounded-xl p-8 transition-all duration-300 ${
+            className={`border-2 border-dashed rounded-xl p-8 transition-all duration-300 cyber-glass ${
               isDragging
-                ? 'border-blue-500 bg-blue-500/10'
-                : 'border-gray-200 bg-white hover:bg-white/50'
+                ? 'border-cyan-500 border-opacity-100'
+                : 'border-cyan-500/40 border-opacity-50'
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -153,8 +159,8 @@ export default function ResumePage() {
                 📄
               </motion.div>
 
-              <h3 className="text-lg font-semibold mb-2">Drop your resume here</h3>
-              <p className="text-gray-600 text-sm mb-4">or click to browse</p>
+              <h3 className="text-lg font-semibold mb-2 text-cyan-300">Drop your resume here</h3>
+              <p className="text-slate-400 text-sm mb-4">or click to browse</p>
 
               <input
                 ref={fileInputRef}
@@ -167,36 +173,36 @@ export default function ResumePage() {
               <motion.button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500/40 to-purple-500/40 hover:from-cyan-500/60 hover:to-purple-500/60 rounded-lg text-sm font-medium text-cyan-300 disabled:opacity-50 transition-all border border-cyan-500/50 neon-glow-cyan"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 {isUploading ? 'Uploading...' : 'Choose File'}
               </motion.button>
 
-              <p className="text-xs text-gray-700 mt-4">PDF up to 10MB</p>
+              <p className="text-xs text-slate-500 mt-4">PDF up to 10MB</p>
             </div>
 
             {/* Progress indicator */}
             <AnimatePresence>
               {isUploading && (
                 <motion.div
-                  className="mt-4 pt-4 border-t border-purple-100"
+                  className="mt-4 pt-4 border-t border-cyan-500/20"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
                   <div className="flex items-center gap-2">
                     <motion.div
-                      className="flex-1 h-2 bg-white/50 rounded-full overflow-hidden"
+                      className="flex-1 h-2 bg-slate-700/50 rounded-full overflow-hidden"
                     >
                       <motion.div
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                        className="h-full bg-gradient-to-r from-cyan-500 to-purple-500"
                         animate={{ x: ['0%', '100%'] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       />
                     </motion.div>
-                    <span className="text-xs text-gray-600">Processing...</span>
+                    <span className="text-xs text-slate-400">Processing...</span>
                   </div>
                 </motion.div>
               )}
@@ -219,61 +225,63 @@ export default function ResumePage() {
         </div>
 
         {/* Preview Section */}
-        {parsedData && (
+        {(parsedData || isScanActive) && (
           <motion.div
-            className="lg:col-span-2"
+            className="lg:col-span-2 relative"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
+            ref={previewRef}
           >
-            <div className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-8">
-              <h2 className="text-2xl font-semibold mb-6">Parsed Resume Data</h2>
+            <ScanBeam isActive={isScanActive} onComplete={() => setIsScanActive(false)} />
+            <div className="cyber-glass border border-cyan-500/30 rounded-xl p-8 relative">
+              <h2 className="text-2xl font-semibold mb-6 text-cyan-300">Parsed Resume Data</h2>
 
               {/* Basic Info */}
-              {parsedData.name && (
+              {parsedData && parsedData.name && (
                 <motion.div
-                  className="mb-6"
+                  className="mb-6 pb-6 border-b border-cyan-500/20"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <h3 className="text-lg font-semibold text-blue-400 mb-2">{parsedData.name}</h3>
+                  <h3 className="text-lg font-semibold text-cyan-300 mb-2">{parsedData.name}</h3>
                   {parsedData.email && (
-                    <p className="text-sm text-gray-600">📧 {parsedData.email}</p>
+                    <p className="text-sm text-slate-400">📧 {parsedData.email}</p>
                   )}
                   {parsedData.phone && (
-                    <p className="text-sm text-gray-600">📱 {parsedData.phone}</p>
+                    <p className="text-sm text-slate-400">📱 {parsedData.phone}</p>
                   )}
                 </motion.div>
               )}
 
               {/* Summary */}
-              {parsedData.summary && (
+              {parsedData && parsedData.summary && (
                 <motion.div
-                  className="mb-6"
+                  className="mb-6 pb-6 border-b border-cyan-500/20"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <h4 className="text-sm font-semibold text-gray-300 mb-2">Summary</h4>
-                  <p className="text-sm text-gray-600 line-clamp-3">{parsedData.summary}</p>
+                  <h4 className="text-sm font-semibold text-cyan-300 mb-2">Summary</h4>
+                  <p className="text-sm text-slate-400 line-clamp-3">{parsedData.summary}</p>
                 </motion.div>
               )}
 
               {/* Skills */}
-              {parsedData.skills && parsedData.skills.length > 0 && (
+              {parsedData && parsedData.skills && parsedData.skills.length > 0 && (
                 <motion.div
-                  className="mb-6"
+                  className="mb-6 pb-6 border-b border-cyan-500/20"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <h4 className="text-sm font-semibold text-gray-300 mb-3">Skills</h4>
+                  <h4 className="text-sm font-semibold text-cyan-300 mb-3">Skills</h4>
                   <div className="flex flex-wrap gap-2">
                     {parsedData.skills.slice(0, 8).map((skill, index) => (
                       <motion.span
                         key={index}
-                        className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs"
+                        className="px-3 py-1 bg-cyan-900/40 text-cyan-300 rounded-full text-xs border border-cyan-500/30"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 + index * 0.05 }}
@@ -282,7 +290,7 @@ export default function ResumePage() {
                       </motion.span>
                     ))}
                     {parsedData.skills.length > 8 && (
-                      <span className="px-3 py-1 bg-gray-500/20 text-gray-300 rounded-full text-xs">
+                      <span className="px-3 py-1 bg-slate-900/40 text-slate-300 rounded-full text-xs border border-slate-500/30">
                         +{parsedData.skills.length - 8} more
                       </span>
                     )}
@@ -291,52 +299,55 @@ export default function ResumePage() {
               )}
 
               {/* Experience */}
-              {parsedData.experience && parsedData.experience.length > 0 && (
+              {parsedData && parsedData.experience && parsedData.experience.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
+                  className="mb-6"
                 >
-                  <h4 className="text-sm font-semibold text-gray-300 mb-3">Experience</h4>
+                  <h4 className="text-sm font-semibold text-cyan-300 mb-3">Experience</h4>
                   <div className="space-y-3">
                     {parsedData.experience.slice(0, 3).map((exp, index) => (
                       <motion.div
                         key={index}
-                        className="p-3 bg-white rounded-lg border border-purple-100"
+                        className="p-3 bg-slate-800/30 rounded-lg border-l-4 border-l-purple-500/50 border border-slate-700/50"
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 + index * 0.1 }}
                       >
-                        <p className="font-medium text-sm">{exp.role}</p>
-                        <p className="text-xs text-gray-600">{exp.company}</p>
+                        <p className="font-medium text-sm text-slate-300">{exp.role}</p>
+                        <p className="text-xs text-slate-500">{exp.company}</p>
                       </motion.div>
                     ))}
                   </div>
                 </motion.div>
               )}
 
-              <motion.button
-                onClick={handleConfirmResume}
-                disabled={isConfirming}
-                className="w-full mt-6 py-2 px-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-                whileHover={{ scale: isConfirming ? 1 : 1.02 }}
-                whileTap={{ scale: isConfirming ? 1 : 0.98 }}
-              >
-                <motion.span
-                  animate={{ opacity: isConfirming ? 0 : 1 }}
-                  transition={{ duration: 0.2 }}
+              {parsedData && (
+                <motion.button
+                  onClick={handleConfirmResume}
+                  disabled={isConfirming}
+                  className="w-full mt-6 py-2 px-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden neon-glow-cyan"
+                  whileHover={{ scale: isConfirming ? 1 : 1.02 }}
+                  whileTap={{ scale: isConfirming ? 1 : 0.98 }}
                 >
-                  ✓ Confirm Resume
-                </motion.span>
-                {isConfirming && (
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center"
-                    animate={{ opacity: 1 }}
+                  <motion.span
+                    animate={{ opacity: isConfirming ? 0 : 1 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  </motion.div>
-                )}
-              </motion.button>
+                    ✓ Confirm Resume
+                  </motion.span>
+                  {isConfirming && (
+                    <motion.div
+                      className="absolute inset-0 flex items-center justify-center"
+                      animate={{ opacity: 1 }}
+                    >
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    </motion.div>
+                  )}
+                </motion.button>
+              )}
             </div>
           </motion.div>
         )}

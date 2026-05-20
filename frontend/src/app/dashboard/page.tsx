@@ -12,7 +12,7 @@ interface DashboardStats {
 
 const StatCard = ({ icon, label, value, delay }: { icon: string; label: string; value: number; delay: number }) => (
   <motion.div
-    className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
+    className="cyber-glass border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/50 transition-colors"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4 }}
@@ -20,11 +20,11 @@ const StatCard = ({ icon, label, value, delay }: { icon: string; label: string; 
   >
     <div className="flex items-start justify-between mb-4">
       <div className="text-3xl">{icon}</div>
-      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">+12%</span>
+      <span className="text-xs bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded border border-cyan-500/30">+12%</span>
     </div>
-    <p className="text-gray-600 text-sm mb-2">{label}</p>
+    <p className="text-slate-400 text-sm mb-2">{label}</p>
     <motion.p
-      className="text-3xl font-bold"
+      className="text-3xl font-bold ai-text"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: delay + 0.3, duration: 0.6 }}
@@ -87,8 +87,8 @@ export default function DashboardPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="text-4xl font-bold mb-2">Welcome back! 👋</h1>
-        <p className="text-gray-600">Here's what's happening with your job search</p>
+        <h1 className="text-4xl font-bold mb-2 ai-text">Welcome back! 👋</h1>
+        <p className="text-slate-400">Here's what's happening with your job search</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -107,16 +107,16 @@ export default function DashboardPage() {
         transition={{ delay: 0.4, duration: 0.4 }}
       >
         {/* Upload Resume Card */}
-        <div className="bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-xl p-8">
+        <div className="cyber-glass border border-cyan-500/30 rounded-xl p-8 hover:border-cyan-400/50 transition-colors">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-xl font-semibold mb-2">Upload Your Resume</h3>
-              <p className="text-gray-600 text-sm">Keep your resume up-to-date for better job matches</p>
+              <h3 className="text-xl font-semibold mb-2 text-cyan-300">Upload Your Resume</h3>
+              <p className="text-slate-400 text-sm">Keep your resume up-to-date for better job matches</p>
             </div>
             <span className="text-3xl">📄</span>
           </div>
           <motion.button
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
+            className="w-full py-2 px-4 bg-gradient-to-r from-cyan-500/40 to-purple-500/40 hover:from-cyan-500/60 hover:to-purple-500/60 rounded-lg text-sm font-medium text-cyan-300 transition-all border border-cyan-500/50 neon-glow-cyan"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -125,16 +125,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Find Jobs Card */}
-        <div className="bg-gradient-to-br from-green-600/10 to-emerald-600/10 border border-green-500/20 rounded-xl p-8">
+        <div className="cyber-glass border border-purple-500/30 rounded-xl p-8 hover:border-purple-400/50 transition-colors">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-xl font-semibold mb-2">Find New Jobs</h3>
-              <p className="text-gray-600 text-sm">Search and match with thousands of opportunities</p>
+              <h3 className="text-xl font-semibold mb-2 text-purple-300">Find New Jobs</h3>
+              <p className="text-slate-400 text-sm">Search and match with thousands of opportunities</p>
             </div>
             <span className="text-3xl">🔍</span>
           </div>
           <motion.button
-            className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition-colors"
+            className="w-full py-2 px-4 bg-gradient-to-r from-purple-500/40 to-pink-500/40 hover:from-purple-500/60 hover:to-pink-500/60 rounded-lg text-sm font-medium text-purple-300 transition-all border border-purple-500/50 neon-glow-purple"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -150,7 +150,7 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.4 }}
       >
-        <h2 className="text-2xl font-semibold mb-6">Recent Activity</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-cyan-300">Recent Activity</h2>
         <div className="space-y-3">
           {[
             { time: '2 hours ago', action: 'Found 5 new job matches', icon: '✨' },
@@ -160,7 +160,7 @@ export default function DashboardPage() {
           ].map((activity, index) => (
             <motion.div
               key={index}
-              className="flex items-center gap-4 p-4 bg-white border border-purple-100 rounded-lg hover:bg-white/50 transition-colors"
+              className="flex items-center gap-4 p-4 cyber-glass border border-cyan-500/20 rounded-lg hover:border-cyan-500/40 transition-colors"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
@@ -168,10 +168,10 @@ export default function DashboardPage() {
             >
               <span className="text-2xl">{activity.icon}</span>
               <div className="flex-1">
-                <p className="text-[#0f172a] font-medium">{activity.action}</p>
-                <p className="text-gray-600 text-sm">{activity.time}</p>
+                <p className="text-slate-300 font-medium">{activity.action}</p>
+                <p className="text-slate-500 text-sm">{activity.time}</p>
               </div>
-              <span className="text-gray-600">→</span>
+              <span className="text-cyan-400">→</span>
             </motion.div>
           ))}
         </div>
