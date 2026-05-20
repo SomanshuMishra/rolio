@@ -425,12 +425,13 @@ export default function JobsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="mb-12"
+              className="mb-12 max-w-4xl mx-auto"
             >
               {searchStatus.status === 'pending' && (
                 <motion.div
-                  className="cyber-glass border border-cyan-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4"
-                  animate={{ boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)' }}
+                  className="bg-gradient-to-r from-slate-800/40 to-slate-800/40 backdrop-blur-xl border border-cyan-500/40 rounded-2xl p-6 md:p-8 flex items-center gap-4 relative overflow-hidden"
+                  animate={{ borderColor: ['rgba(34, 211, 238, 0.4)', 'rgba(34, 211, 238, 0.8)', 'rgba(34, 211, 238, 0.4)'] }}
+                  transition={{ duration: 2, repeat: Infinity }}
                 >
                   <motion.div
                     animate={{ rotate: 360 }}
@@ -444,24 +445,45 @@ export default function JobsPage() {
               {searchStatus.status === 'in_progress' && (
                 <div className="space-y-4">
                   <motion.div
-                    className="cyber-glass border border-cyan-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4"
-                    animate={{ boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)' }}
+                    className="bg-gradient-to-r from-slate-800/40 to-slate-800/40 backdrop-blur-xl border border-cyan-500/40 rounded-2xl p-6 md:p-8 flex items-center gap-4 relative overflow-hidden"
+                    animate={{ boxShadow: ['0 0 20px rgba(34, 211, 238, 0.1)', '0 0 40px rgba(34, 211, 238, 0.3)', '0 0 20px rgba(34, 211, 238, 0.1)'] }}
+                    transition={{ duration: 2, repeat: Infinity }}
                   >
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity }}
                       className="w-8 h-8 border-3 border-cyan-500 border-t-purple-500 rounded-full flex-shrink-0"
                     />
-                    <span className="text-cyan-300 font-semibold text-sm md:text-base">Searching jobs from multiple sources...</span>
+                    <span className="text-cyan-300 font-semibold text-sm md:text-base">Analyzing opportunities across the network...</span>
                   </motion.div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <motion.div className="cyber-glass border border-cyan-500/30 rounded-2xl p-6">
-                      <p className="text-xs md:text-sm text-slate-400 mb-1">Total Jobs Searched</p>
-                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_jobs_searched}</p>
+                    <motion.div
+                      className="bg-gradient-to-br from-slate-800/40 via-slate-800/40 to-slate-900/40 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-6 relative overflow-hidden"
+                      whileHover={{ scale: 1.02, borderColor: 'rgba(34, 211, 238, 0.6)' }}
+                    >
+                      <p className="text-xs md:text-sm text-slate-400 mb-2">Total Jobs Scanned</p>
+                      <motion.p
+                        className="text-3xl md:text-4xl font-black text-cyan-300"
+                        key={searchStatus.total_jobs_searched}
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {searchStatus.total_jobs_searched}
+                      </motion.p>
                     </motion.div>
-                    <motion.div className="cyber-glass border border-purple-500/30 rounded-2xl p-6">
-                      <p className="text-xs md:text-sm text-slate-400 mb-1">Matches Found</p>
-                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_matches}</p>
+                    <motion.div
+                      className="bg-gradient-to-br from-slate-800/40 via-slate-800/40 to-slate-900/40 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-6 relative overflow-hidden"
+                      whileHover={{ scale: 1.02, borderColor: 'rgba(139, 92, 246, 0.6)' }}
+                    >
+                      <p className="text-xs md:text-sm text-slate-400 mb-2">Matches Identified</p>
+                      <motion.p
+                        className="text-3xl md:text-4xl font-black text-purple-300"
+                        key={searchStatus.total_matches}
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {searchStatus.total_matches}
+                      </motion.p>
                     </motion.div>
                   </div>
                 </div>
@@ -470,47 +492,52 @@ export default function JobsPage() {
               {searchStatus.status === 'completed' && (
                 <div className="space-y-4">
                   <motion.div
-                    className="cyber-glass border border-cyan-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4"
-                    animate={{ boxShadow: '0 0 30px rgba(6, 182, 212, 0.3)' }}
+                    className="bg-gradient-to-r from-slate-800/40 to-slate-800/40 backdrop-blur-xl border border-cyan-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4 relative overflow-hidden"
+                    animate={{ boxShadow: ['0 0 30px rgba(34, 211, 238, 0.2)', '0 0 50px rgba(34, 211, 238, 0.4)', '0 0 30px rgba(34, 211, 238, 0.2)'] }}
+                    transition={{ duration: 2, repeat: Infinity }}
                   >
                     <motion.span
                       className="text-4xl"
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 0.5 }}
+                      animate={{ scale: [1, 1.3, 1], rotate: [0, 10, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity }}
                     >
-                      ✓
+                      ✨
                     </motion.span>
                     <div>
-                      <p className="text-base md:text-lg font-bold text-cyan-300">Search Completed!</p>
-                      <p className="text-xs md:text-sm text-slate-400">Your job matches are ready</p>
+                      <p className="text-base md:text-lg font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">Discovery Complete!</p>
+                      <p className="text-xs md:text-sm text-slate-400">Your matches are ready for exploration</p>
                     </div>
                   </motion.div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <motion.div className="cyber-glass border border-cyan-500/30 rounded-2xl p-6">
-                      <p className="text-xs md:text-sm text-slate-400 mb-1">Total Searched</p>
-                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_jobs_searched}</p>
+                    <motion.div className="bg-gradient-to-br from-slate-800/40 via-slate-800/40 to-slate-900/40 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-6 relative overflow-hidden">
+                      <p className="text-xs md:text-sm text-slate-400 mb-2">Total Scanned</p>
+                      <p className="text-3xl md:text-4xl font-black text-cyan-300">{searchStatus.total_jobs_searched}</p>
                     </motion.div>
-                    <motion.div className="cyber-glass border border-purple-500/30 rounded-2xl p-6">
-                      <p className="text-xs md:text-sm text-slate-400 mb-1">Qualified Matches</p>
-                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_matches}</p>
+                    <motion.div className="bg-gradient-to-br from-slate-800/40 via-slate-800/40 to-slate-900/40 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-6 relative overflow-hidden">
+                      <p className="text-xs md:text-sm text-slate-400 mb-2">Perfect Matches</p>
+                      <p className="text-3xl md:text-4xl font-black text-purple-300">{searchStatus.total_matches}</p>
                     </motion.div>
                   </div>
                   {searchResults.length > 0 && (
                     <motion.button
                       onClick={handleDownloadExcel}
-                      className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 neon-glow-cyan"
+                      className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 neon-glow-cyan transition-all"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      📥 Download All Results (Excel)
+                      📥 Download Results (Excel)
                     </motion.button>
                   )}
                 </div>
               )}
 
               {searchStatus.status === 'failed' && (
-                <motion.div className="cyber-glass border border-red-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4">
-                  <span className="text-4xl">✗</span>
+                <motion.div
+                  className="bg-gradient-to-r from-red-900/20 to-red-900/20 backdrop-blur-xl border border-red-500/40 rounded-2xl p-6 md:p-8 flex items-center gap-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <span className="text-4xl">⚠️</span>
                   <span className="text-red-400 font-semibold text-sm md:text-base">Search failed. Please try again.</span>
                 </motion.div>
               )}
@@ -522,26 +549,30 @@ export default function JobsPage() {
         <AnimatePresence>
           {searchStatus?.status === 'completed' && searchResults.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
+              transition={{ delay: 0.3 }}
+              className="space-y-6 mt-12"
             >
               {/* Header */}
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div>
+              <div className="flex items-center justify-between gap-4 flex-wrap max-w-7xl mx-auto">
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 ai-text">
-                    {searchResults.length} Opportunities
+                    {searchResults.length} Discovered
                   </h2>
-                  <p className="text-xs md:text-sm text-slate-400">Click a job to see details</p>
-                </div>
+                  <p className="text-xs md:text-sm text-slate-400">💫 Select any role to explore further</p>
+                </motion.div>
                 {searchResults.length > 0 && (
                   <motion.button
                     onClick={handleDownloadExcel}
-                    className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-xl font-bold text-xs md:text-sm whitespace-nowrap neon-glow-cyan"
+                    className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-xl font-bold text-xs md:text-sm whitespace-nowrap neon-glow-cyan transition-all"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
                   >
-                    📥 Download (Excel)
+                    📥 Export Results
                   </motion.button>
                 )}
               </div>
