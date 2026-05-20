@@ -263,134 +263,164 @@ export default function ResumePage() {
         {/* Preview Section */}
         {!isLoading && (parsedData || isScanActive) && (
           <motion.div
-            className="lg:col-span-2 relative"
+            className="lg:col-span-2 relative space-y-6"
             initial={{ opacity: 0, x: 20, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.5, type: 'spring' }}
             ref={previewRef}
           >
             <ScanBeam isActive={isScanActive} onComplete={() => setIsScanActive(false)} />
-            <motion.div
-              className="cyber-glass border border-cyan-500/30 rounded-xl p-6 md:p-8 relative overflow-hidden group"
-              whileHover={{ borderColor: 'rgba(6, 182, 212, 0.5)' }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-purple-500/0 group-hover:from-cyan-500/10 group-hover:to-purple-500/10 transition-all duration-300" />
-              <div className="relative z-10">
-                <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-cyan-300">Parsed Resume Data</h2>
 
-              {/* Basic Info */}
-              {parsedData && parsedData.name && (
-                <motion.div
-                  className="mb-6 pb-6 border-b border-cyan-500/20"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <h3 className="text-lg font-semibold text-cyan-300 mb-2">{parsedData.name}</h3>
-                  {parsedData.email && (
-                    <p className="text-sm text-slate-400">📧 {parsedData.email}</p>
-                  )}
-                  {parsedData.phone && (
-                    <p className="text-sm text-slate-400">📱 {parsedData.phone}</p>
-                  )}
-                </motion.div>
-              )}
+            {/* Basic Info Card - Large and Prominent */}
+            {parsedData && parsedData.name && (
+              <motion.div
+                className="cyber-glass border border-cyan-500/30 rounded-xl p-8 md:p-10 relative overflow-hidden group"
+                whileHover={{ borderColor: 'rgba(6, 182, 212, 0.6)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-purple-500/0 group-hover:from-cyan-500/10 group-hover:to-purple-500/10 transition-all duration-300" />
+                <div className="relative z-10">
+                  <h2 className="text-4xl md:text-5xl font-black mb-4 ai-text">{parsedData.name}</h2>
+                  <div className="space-y-3">
+                    {parsedData.email && (
+                      <motion.div
+                        className="flex items-center gap-3"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.15 }}
+                      >
+                        <span className="text-2xl">📧</span>
+                        <a href={`mailto:${parsedData.email}`} className="text-lg text-slate-300 hover:text-cyan-400 transition-colors">
+                          {parsedData.email}
+                        </a>
+                      </motion.div>
+                    )}
+                    {parsedData.phone && (
+                      <motion.div
+                        className="flex items-center gap-3"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <span className="text-2xl">📱</span>
+                        <a href={`tel:${parsedData.phone}`} className="text-lg text-slate-300 hover:text-cyan-400 transition-colors">
+                          {parsedData.phone}
+                        </a>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-              {/* Summary */}
-              {parsedData && parsedData.summary && (
-                <motion.div
-                  className="mb-6 pb-6 border-b border-cyan-500/20"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <h4 className="text-sm font-semibold text-cyan-300 mb-2">Summary</h4>
-                  <p className="text-sm text-slate-400 line-clamp-3">{parsedData.summary}</p>
-                </motion.div>
-              )}
+            {/* Summary */}
+            {parsedData && parsedData.summary && (
+              <motion.div
+                className="cyber-glass border border-purple-500/30 rounded-xl p-6 md:p-8 relative overflow-hidden group"
+                whileHover={{ borderColor: 'rgba(139, 92, 246, 0.6)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-cyan-500/0 group-hover:from-purple-500/10 group-hover:to-cyan-500/5 transition-all duration-300" />
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Professional Summary</h3>
+                  <p className="text-slate-300 leading-relaxed">{parsedData.summary}</p>
+                </div>
+              </motion.div>
+            )}
 
-              {/* Skills */}
-              {parsedData && parsedData.skills && parsedData.skills.length > 0 && (
-                <motion.div
-                  className="mb-6 pb-6 border-b border-cyan-500/20"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <h4 className="text-sm font-semibold text-cyan-300 mb-3">Skills</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {parsedData.skills.slice(0, 8).map((skill, index) => (
+            {/* Skills */}
+            {parsedData && parsedData.skills && parsedData.skills.length > 0 && (
+              <motion.div
+                className="cyber-glass border border-green-500/30 rounded-xl p-6 md:p-8 relative overflow-hidden group"
+                whileHover={{ borderColor: 'rgba(34, 197, 94, 0.6)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/0 to-cyan-500/0 group-hover:from-green-500/10 group-hover:to-cyan-500/5 transition-all duration-300" />
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold text-green-300 mb-4">Technical Skills ({parsedData.skills.length})</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {parsedData.skills.map((skill, index) => (
                       <motion.span
                         key={index}
-                        className="px-3 py-1 bg-cyan-900/40 text-cyan-300 rounded-full text-xs border border-cyan-500/30"
+                        className="px-4 py-2 bg-green-900/40 text-green-300 rounded-lg text-sm border border-green-500/40 hover:border-green-500/70 hover:bg-green-900/60 transition-all"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 + index * 0.05 }}
+                        whileHover={{ scale: 1.05 }}
                       >
-                        {skill}
+                        ✓ {skill}
                       </motion.span>
                     ))}
-                    {parsedData.skills.length > 8 && (
-                      <span className="px-3 py-1 bg-slate-900/40 text-slate-300 rounded-full text-xs border border-slate-500/30">
-                        +{parsedData.skills.length - 8} more
-                      </span>
-                    )}
                   </div>
-                </motion.div>
-              )}
+                </div>
+              </motion.div>
+            )}
 
-              {/* Experience */}
-              {parsedData && parsedData.experience && parsedData.experience.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="mb-6"
-                >
-                  <h4 className="text-sm font-semibold text-cyan-300 mb-3">Experience</h4>
-                  <div className="space-y-3">
-                    {parsedData.experience.slice(0, 3).map((exp, index) => (
+            {/* Experience */}
+            {parsedData && parsedData.experience && parsedData.experience.length > 0 && (
+              <motion.div
+                className="cyber-glass border border-orange-500/30 rounded-xl p-6 md:p-8 relative overflow-hidden group"
+                whileHover={{ borderColor: 'rgba(249, 115, 22, 0.6)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-cyan-500/0 group-hover:from-orange-500/10 group-hover:to-cyan-500/5 transition-all duration-300" />
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold text-orange-300 mb-4">Work Experience ({parsedData.experience.length})</h3>
+                  <div className="space-y-4">
+                    {parsedData.experience.map((exp, index) => (
                       <motion.div
                         key={index}
-                        className="p-3 bg-slate-800/30 rounded-lg border-l-4 border-l-purple-500/50 border border-slate-700/50"
-                        initial={{ opacity: 0, x: -10 }}
+                        className="p-4 bg-slate-800/40 rounded-lg border-l-4 border-l-orange-500/60 border border-slate-700/50 hover:border-slate-600/80 hover:bg-slate-800/60 transition-all"
+                        initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 + index * 0.1 }}
+                        transition={{ delay: 0.35 + index * 0.08 }}
+                        whileHover={{ x: 4 }}
                       >
-                        <p className="font-medium text-sm text-slate-300">{exp.role}</p>
-                        <p className="text-xs text-slate-500">{exp.company}</p>
+                        <p className="font-bold text-base text-orange-300">{exp.role}</p>
+                        <p className="text-sm text-slate-400 mt-1">{exp.company}</p>
+                        {exp.duration && (
+                          <p className="text-xs text-slate-500 mt-2">📅 {exp.duration}</p>
+                        )}
                       </motion.div>
                     ))}
                   </div>
-                </motion.div>
-              )}
+                </div>
+              </motion.div>
+            )}
 
-                {parsedData && (
-                  <motion.button
-                    onClick={handleConfirmResume}
-                    disabled={isConfirming}
-                    className="w-full mt-6 py-2 px-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-xs md:text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden neon-glow-cyan"
-                    whileHover={{ scale: isConfirming ? 1 : 1.05 }}
-                    whileTap={{ scale: isConfirming ? 1 : 0.95 }}
+            {/* Confirm Button */}
+            {parsedData && (
+              <motion.button
+                onClick={handleConfirmResume}
+                disabled={isConfirming}
+                className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-500 rounded-lg text-sm font-bold neon-glow-cyan hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                whileHover={{ scale: isConfirming ? 1 : 1.02 }}
+                whileTap={{ scale: isConfirming ? 1 : 0.98 }}
+              >
+                <motion.span
+                  animate={{ opacity: isConfirming ? 0 : 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  ✓ Confirm Resume & Continue
+                </motion.span>
+                {isConfirming && (
+                  <motion.div
+                    className="absolute inset-0 flex items-center justify-center"
+                    animate={{ opacity: 1 }}
                   >
-                    <motion.span
-                      animate={{ opacity: isConfirming ? 0 : 1 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      ✓ Confirm Resume
-                    </motion.span>
-                    {isConfirming && (
-                      <motion.div
-                        className="absolute inset-0 flex items-center justify-center"
-                        animate={{ opacity: 1 }}
-                      >
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      </motion.div>
-                    )}
-                  </motion.button>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  </motion.div>
                 )}
-              </div>
-            </motion.div>
+              </motion.button>
+            )}
           </motion.div>
         )}
       </div>

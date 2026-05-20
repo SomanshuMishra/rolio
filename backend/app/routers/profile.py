@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import logging
 
@@ -6,6 +7,11 @@ from ..database import get_db
 from ..models import User, APIKey
 from ..utils.deps import get_current_user
 from ..utils.security import encrypt_api_key, decrypt_api_key, get_api_key_preview
+
+
+class UpdateProfileRequest(BaseModel):
+    full_name: str = None
+    avatar_url: str = None
 
 router = APIRouter(prefix="/profile", tags=["profile"])
 logger = logging.getLogger(__name__)
@@ -52,17 +58,16 @@ def get_profile(current_user: User = Depends(get_current_user)):
 
 @router.put("")
 def update_profile(
-    full_name: str = None,
-    avatar_url: str = None,
+    request: UpdateProfileRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Update user profile."""
     try:
-        if full_name:
-            current_user.full_name = full_name
-        if avatar_url:
-            current_user.avatar_url = avatar_url
+        if request.full_name:
+            current_user.full_name = request.full_name
+        if request.avatar_url:
+            current_user.avatar_url = request.avatar_url
 
         db.commit()
         db.refresh(current_user)
