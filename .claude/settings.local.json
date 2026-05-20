@@ -53,7 +53,8 @@
       "Bash(chmod +x /Users/somanshumishra/myspace/auto-apply-jobs/scripts/setup-ec2.sh)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(git commit -m 'Fix job discovery bugs and API compatibility issues *)"
+      "Bash(git commit -m 'Fix job discovery bugs and API compatibility issues *)",
+      "Bash(git commit -m 'Optimize job matching performance - limit to 30 jobs max *)"
     ]
   }
 }

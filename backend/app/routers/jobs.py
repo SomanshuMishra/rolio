@@ -239,8 +239,11 @@ async def search_and_match_jobs(
                 detail="No jobs found. Try adjusting your preferences.",
             )
 
+        # Limit jobs to match to avoid timeout (match top 30 only)
+        jobs_to_match = jobs[:min(30, len(jobs))]
+
         logger.info(f"\n6. Starting job matching with AI provider: {api_key_record.provider}")
-        logger.info(f"   Total jobs to match: {len(jobs[:request.limit * 2])}")
+        logger.info(f"   Total jobs to match: {len(jobs_to_match)} (limited to 30 for performance)")
 
         # Match jobs using AI
         matcher = JobMatcher(api_key_record.provider, api_key)
@@ -265,7 +268,7 @@ async def search_and_match_jobs(
         try:
             matches = await matcher.match_jobs(
                 parsed_resume,
-                jobs[:request.limit * 2],
+                jobs_to_match,
                 preferences_dict,
                 required_skills=request.required_skills if request.required_skills else None,
             )
