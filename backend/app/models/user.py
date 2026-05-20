@@ -1,14 +1,23 @@
-from sqlalchemy import Column, String, Boolean, DateTime, func, Index
+from sqlalchemy import Column, String, Boolean, DateTime, func, Index, Text
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
 from datetime import datetime
 import uuid
 from ..database import Base
+from ..config import settings
+
+# Use String IDs for SQLite, UUID for PostgreSQL
+if settings.DATABASE_URL.startswith("sqlite"):
+    ID_TYPE = String(36)
+    ID_DEFAULT = lambda: str(uuid.uuid4())
+else:
+    ID_TYPE = UUID(as_uuid=True)
+    ID_DEFAULT = uuid.uuid4
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(ID_TYPE, primary_key=True, default=ID_DEFAULT)
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255))
@@ -21,8 +30,8 @@ class User(Base):
 class APIKey(Base):
     __tablename__ = "user_api_keys"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    id = Column(ID_TYPE, primary_key=True, default=ID_DEFAULT)
+    user_id = Column(ID_TYPE, nullable=False, index=True)
     provider = Column(String(50), nullable=False)  # 'openai' or 'anthropic'
     encrypted_key = Column(String(500), nullable=False)
     model_preference = Column(String(255))
@@ -37,10 +46,11 @@ class APIKey(Base):
 class UserPreferences(Base):
     __tablename__ = "user_preferences"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), unique=True, nullable=False, index=True)
-    preferred_roles = Column(ARRAY(String), default=list)
-    preferred_locations = Column(ARRAY(String), default=list)
+    id = Column(ID_TYPE, primary_key=True, default=ID_DEFAULT)
+    user_id = Column(ID_TYPE, unique=True, nullable=False, index=True)
+    # Store arrays as comma-separated strings for SQLite compatibility
+    preferred_roles = Column(String(1000), default="")
+    preferred_locations = Column(String(1000), default="")
     salary_min = Column(String(20))
     salary_max = Column(String(20))
     remote_preference = Column(String(50), default="any")  # 'remote', 'hybrid', 'onsite', 'any'
@@ -52,8 +62,8 @@ class UserPreferences(Base):
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    id = Column(ID_TYPE, primary_key=True, default=ID_DEFAULT)
+    user_id = Column(ID_TYPE, nullable=False, index=True)
     token_hash = Column(String(255), unique=True, nullable=False)  # Hash of token for security
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     expires_at = Column(DateTime, nullable=False)

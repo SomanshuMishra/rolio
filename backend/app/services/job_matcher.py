@@ -2,10 +2,34 @@ import logging
 from typing import List, Dict, Any
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+import re
 
 from .ai_provider import get_ai_provider
 
 logger = logging.getLogger(__name__)
+
+# Skills database from resume_parser
+SKILLS_DATABASE = [
+    # Languages
+    "Python", "Java", "JavaScript", "TypeScript", "C++", "C#", "Go", "Rust", "Ruby", "PHP",
+    "Swift", "Kotlin", "Scala", "Groovy", "R", "MATLAB", "SQL", "Bash", "Shell",
+    # Web Frameworks
+    "Django", "Flask", "FastAPI", "Spring", "Spring Boot", "Express", "React", "Vue", "Angular",
+    "Next.js", "Svelte", "Rails", "Laravel", "ASP.NET", "Blazor",
+    # Databases
+    "PostgreSQL", "MySQL", "MongoDB", "Redis", "Cassandra", "DynamoDB", "Elasticsearch",
+    "Oracle", "SQL Server", "MariaDB", "Firebase", "GraphQL",
+    # Cloud & DevOps
+    "AWS", "Azure", "GCP", "Docker", "Kubernetes", "Jenkins", "GitLab", "GitHub", "CircleCI",
+    "Travis CI", "Terraform", "Ansible", "CloudFormation", "EC2", "S3", "Lambda",
+    # Tools & Libraries
+    "Git", "REST API", "GraphQL", "Microservices", "Celery", "RabbitMQ", "Kafka",
+    "NumPy", "Pandas", "Scikit-learn", "TensorFlow", "PyTorch", "OpenCV",
+    "HTML", "CSS", "Sass", "Bootstrap", "Tailwind", "Material UI",
+    # Other
+    "AI", "ML", "Machine Learning", "Deep Learning", "NLP", "Data Science",
+    "Big Data", "Spark", "Hadoop", "ETL", "CI/CD", "Agile", "Scrum",
+]
 
 
 class JobMatcher:
@@ -20,6 +44,7 @@ class JobMatcher:
         resume_data: Dict[str, Any],
         jobs: List[Dict[str, Any]],
         preferences: Dict[str, Any],
+        required_skills: List[str] = None,
     ) -> List[Dict[str, Any]]:
         """Match jobs to candidate and return ranked list with scores.
 
@@ -27,6 +52,7 @@ class JobMatcher:
             resume_data: Parsed resume data
             jobs: List of job listings
             preferences: User preferences (salary, location, remote, etc.)
+            required_skills: Optional list of required skills to filter jobs
 
         Returns:
             List of matched jobs with scores, sorted by match quality
@@ -34,19 +60,37 @@ class JobMatcher:
         try:
             matches = []
 
+            logger.info(f"\n>>> Starting job matching for {len(jobs)} jobs")
+            if required_skills:
+                logger.info(f"    Filtering by required skills: {required_skills}")
+
             # Generate resume embedding
             resume_text = self._format_resume_for_embedding(resume_data)
-            resume_embedding = await self.ai_provider.get_embedding(resume_text)
+            logger.info(f"    Resume text for embedding ({len(resume_text)} chars): {resume_text[:100]}...")
 
-            for job in jobs:
+            resume_embedding = await self.ai_provider.get_embedding(resume_text)
+            logger.info(f"    Resume embedding generated: {len(resume_embedding)} dimensions")
+
+            for i, job in enumerate(jobs):
+                logger.info(f"\n    Job {i+1}/{len(jobs)}: {job.get('title', 'Unknown')} at {job.get('company', 'Unknown')}")
+
                 # Skip if job doesn't meet basic criteria
                 if not self._meets_hard_filters(job, preferences):
+                    logger.info(f"      ⊘ Skipped (doesn't meet hard filters)")
                     continue
+
+                # Skip if required skills filter is set and job doesn't have any required skills
+                if required_skills:
+                    job_skills = self._extract_skills_from_job(job)
+                    if not any(skill.lower() in [s.lower() for s in job_skills] for skill in required_skills):
+                        logger.info(f"      ⊘ Skipped (doesn't match required skills: {required_skills})")
+                        continue
 
                 try:
                     # Generate job embedding
                     job_text = self._format_job_for_embedding(job)
                     job_embedding = await self.ai_provider.get_embedding(job_text)
+                    logger.info(f"      ✓ Job embedding generated")
 
                     # Calculate similarity
                     similarity = cosine_similarity(
@@ -56,9 +100,11 @@ class JobMatcher:
 
                     # Normalize to 0-100 scale
                     base_score = (similarity + 1) / 2 * 100
+                    logger.info(f"      • Embedding similarity: {base_score:.1f}")
 
                     # Apply AI analysis for detailed reasoning
                     analysis = await self.ai_provider.analyze_match(resume_data, job)
+                    logger.info(f"      ✓ AI analysis complete: {len(analysis.get('reasons', []))} reasons")
 
                     # Combine scores
                     final_score = self._calculate_final_score(
@@ -67,6 +113,8 @@ class JobMatcher:
                         job,
                         preferences,
                     )
+
+                    logger.info(f"      → Final score: {final_score:.1f}")
 
                     if final_score > 0:  # Only include non-zero matches
                         matches.append(
@@ -101,15 +149,20 @@ class JobMatcher:
         preferences: Dict[str, Any],
     ) -> bool:
         """Check if job meets hard filters (quick elimination)."""
-        # Location filter
-        if preferences.get("preferred_locations"):
-            if not job.get("is_remote"):
-                job_location = job.get("location", "").lower()
-                preferred_locs = [loc.lower() for loc in preferences["preferred_locations"]]
+        job_location = job.get("location", "").lower()
+        job_title = job.get("title", "").lower()
+        job_description = job.get("description", "").lower()
+        is_job_remote = job.get("is_remote", False) or "remote" in job_location or "remote" in job_title or "remote" in job_description
 
+        # Location filter - check if job is remote or matches preferred locations
+        if preferences.get("preferred_locations"):
+            preferred_locs = [loc.lower() for loc in preferences["preferred_locations"]]
+
+            # Allow if job is remote
+            if not is_job_remote:
+                # Otherwise check if location matches preferences
                 if not any(pref in job_location for pref in preferred_locs):
-                    if "remote" not in job_location:
-                        return False
+                    return False
 
         # Salary filter
         if preferences.get("salary_min"):
@@ -124,7 +177,7 @@ class JobMatcher:
 
         # Remote preference filter
         if preferences.get("remote_preference") == "remote":
-            if not job.get("is_remote"):
+            if not is_job_remote:
                 return False
 
         return True
@@ -139,8 +192,8 @@ class JobMatcher:
         """Calculate final match score with multipliers."""
         score = base_score * 0.6  # 60% weight on embedding similarity
 
-        # Add analysis score (40% weight)
-        analysis_score = analysis.get("match_score", 50)
+        # Add analysis score (40% weight) - default to 70 if not provided (more optimistic)
+        analysis_score = analysis.get("match_score", 70)
         score += (analysis_score * 0.4)
 
         # Apply multipliers for skills match
@@ -149,8 +202,8 @@ class JobMatcher:
             skills_multiplier = min(len(matching_skills) / 5, 1.2)  # Up to 20% boost
             score *= skills_multiplier
 
-        # Apply confidence penalty
-        role_confidence = analysis.get("role_match_confidence", 0.5)
+        # Apply confidence penalty (but not too harsh - we don't always have all data)
+        role_confidence = analysis.get("role_match_confidence", 0.75)
         score *= role_confidence
 
         # Apply location penalty
@@ -232,6 +285,31 @@ class JobMatcher:
             parts.append(f"Certifications: {', '.join(resume_data['certifications'][:5])}")
 
         return "\n".join(parts)
+
+    def _extract_skills_from_job(self, job: Dict[str, Any]) -> List[str]:
+        """Extract technical skills from job description and requirements."""
+        found_skills = []
+        combined_text = ""
+
+        # Combine job description, title, and requirements
+        if job.get("title"):
+            combined_text += job.get("title", "") + " "
+        if job.get("description"):
+            combined_text += job.get("description", "") + " "
+        if job.get("requirements"):
+            if isinstance(job.get("requirements"), list):
+                combined_text += " ".join(job.get("requirements", []))
+            else:
+                combined_text += str(job.get("requirements", ""))
+
+        combined_text_lower = combined_text.lower()
+
+        # Search for skills using word boundaries
+        for skill in SKILLS_DATABASE:
+            if re.search(r"\b" + re.escape(skill.lower()) + r"\b", combined_text_lower):
+                found_skills.append(skill)
+
+        return list(set(found_skills))  # Remove duplicates
 
     def _format_job_for_embedding(self, job: Dict[str, Any]) -> str:
         """Format job for embedding generation."""

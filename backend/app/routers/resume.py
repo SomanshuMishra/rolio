@@ -74,12 +74,12 @@ async def upload_resume(
             db.delete(existing_resume)
             db.commit()
 
-        # Save to database
+        # Save to database (serialize parsed_data to JSON for SQLite compatibility)
         resume = Resume(
             user_id=current_user.id,
             filename=file.filename,
             s3_file_path=s3_path,
-            parsed_data=parsed_data,
+            parsed_data=json.dumps(parsed_data),
             raw_text=parsed_data.get("raw_text"),
         )
         db.add(resume)
@@ -88,6 +88,7 @@ async def upload_resume(
 
         logger.info(f"Resume uploaded for user {current_user.id}: {file.filename}")
 
+        # parsed_data is now stored as JSON string in DB, so use the original dict
         return ResumeUploadResponse(
             id=resume.id,
             filename=resume.filename,
@@ -124,12 +125,14 @@ def get_resume(
             detail="No resume found. Please upload a resume first.",
         )
 
+    # Deserialize JSON string to dict if stored as string (SQLite), else use as-is (PostgreSQL)
+    parsed_dict = json.loads(resume.parsed_data) if isinstance(resume.parsed_data, str) else resume.parsed_data
     return ResumeResponse(
         id=resume.id,
         filename=resume.filename,
         s3_file_path=resume.s3_file_path,
         upload_date=resume.upload_date,
-        parsed_data=ParsedResumeData(**resume.parsed_data),
+        parsed_data=ParsedResumeData(**parsed_dict),
         raw_text=resume.raw_text,
     )
 
@@ -148,7 +151,9 @@ def get_parsed_resume_data(
             detail="No resume found",
         )
 
-    return ParsedResumeData(**resume.parsed_data)
+    # Deserialize JSON string to dict if stored as string (SQLite), else use as-is (PostgreSQL)
+    parsed_dict = json.loads(resume.parsed_data) if isinstance(resume.parsed_data, str) else resume.parsed_data
+    return ParsedResumeData(**parsed_dict)
 
 
 @router.delete("/", response_model=ResumeDeleteResponse)

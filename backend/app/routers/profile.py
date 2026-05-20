@@ -98,10 +98,10 @@ def add_api_key(
 ):
     """Add encrypted API key for OpenAI or Claude."""
     try:
-        if provider.lower() not in ["openai", "anthropic"]:
+        if provider.lower() not in ["openai", "anthropic", "google", "groq"]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Provider must be 'openai' or 'anthropic'",
+                detail="Provider must be 'openai', 'anthropic', 'google', or 'groq'",
             )
 
         if not api_key or len(api_key) < 10:
@@ -116,25 +116,29 @@ def add_api_key(
             APIKey.provider == provider.lower(),
         ).first()
 
-        if existing:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"API key for {provider} already exists. Delete it first.",
-            )
-
-        # Encrypt and store
+        # Encrypt the key
         encrypted_key = encrypt_api_key(api_key)
-        api_key_record = APIKey(
-            user_id=current_user.id,
-            provider=provider.lower(),
-            encrypted_key=encrypted_key,
-            model_preference=model_preference,
-        )
-        db.add(api_key_record)
-        db.commit()
-        db.refresh(api_key_record)
 
-        logger.info(f"Added API key for user {current_user.id}: {provider}")
+        if existing:
+            # Update existing key
+            existing.encrypted_key = encrypted_key
+            existing.model_preference = model_preference
+            db.commit()
+            db.refresh(existing)
+            api_key_record = existing
+            logger.info(f"Updated API key for user {current_user.id}: {provider}")
+        else:
+            # Create new key
+            api_key_record = APIKey(
+                user_id=current_user.id,
+                provider=provider.lower(),
+                encrypted_key=encrypted_key,
+                model_preference=model_preference,
+            )
+            db.add(api_key_record)
+            db.commit()
+            db.refresh(api_key_record)
+            logger.info(f"Added API key for user {current_user.id}: {provider}")
 
         return {
             "id": str(api_key_record.id),

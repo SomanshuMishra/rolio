@@ -7,6 +7,7 @@ import uuid
 class JobSearchRequest(BaseModel):
     limit: int = Field(10, ge=1, le=50)
     force_refresh: bool = False
+    required_skills: List[str] = Field(default_factory=list)
 
 
 class JobData(BaseModel):

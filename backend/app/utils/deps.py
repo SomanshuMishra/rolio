@@ -1,7 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-import uuid
 
 from ..database import get_db
 from ..models import User
@@ -33,15 +32,8 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    try:
-        user_id = uuid.UUID(user_id)
-    except (ValueError, TypeError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid user ID in token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
+    # Keep user_id as string for SQLite compatibility
+    # (PostgreSQL UUID will still work as strings are coerced to UUID)
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(

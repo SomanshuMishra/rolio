@@ -1,22 +1,22 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 import uuid
 
 
 class UserRegister(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=8, max_length=72)
     full_name: str = Field(..., min_length=2)
 
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., max_length=72)
 
 
 class UserResponse(BaseModel):
-    id: uuid.UUID
+    id: Union[str, uuid.UUID]
     email: str
     full_name: str
     avatar_url: Optional[str] = None

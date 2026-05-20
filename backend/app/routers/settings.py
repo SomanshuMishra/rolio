@@ -11,6 +11,20 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 logger = logging.getLogger(__name__)
 
 
+def parse_comma_separated(value: str) -> List[str]:
+    """Parse comma-separated string to list."""
+    if not value:
+        return []
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def list_to_comma_separated(items: List[str]) -> str:
+    """Convert list to comma-separated string."""
+    if not items:
+        return ""
+    return ",".join(str(item).strip() for item in items if item)
+
+
 @router.get("/preferences")
 def get_preferences(
     current_user = Depends(get_current_user),
@@ -31,8 +45,8 @@ def get_preferences(
         return {
             "id": str(preferences.id),
             "user_id": str(preferences.user_id),
-            "preferred_roles": preferences.preferred_roles or [],
-            "preferred_locations": preferences.preferred_locations or [],
+            "preferred_roles": parse_comma_separated(preferences.preferred_roles),
+            "preferred_locations": parse_comma_separated(preferences.preferred_locations),
             "salary_min": preferences.salary_min,
             "salary_max": preferences.salary_max,
             "remote_preference": preferences.remote_preference,
@@ -81,11 +95,11 @@ def update_preferences(
                 detail="remote_preference must be one of: remote, hybrid, onsite, any",
             )
 
-        # Update fields
+        # Update fields (convert lists to comma-separated strings)
         if preferred_roles is not None:
-            preferences.preferred_roles = preferred_roles
+            preferences.preferred_roles = list_to_comma_separated(preferred_roles)
         if preferred_locations is not None:
-            preferences.preferred_locations = preferred_locations
+            preferences.preferred_locations = list_to_comma_separated(preferred_locations)
         if salary_min is not None:
             preferences.salary_min = salary_min
         if salary_max is not None:
@@ -103,8 +117,8 @@ def update_preferences(
         return {
             "id": str(preferences.id),
             "user_id": str(preferences.user_id),
-            "preferred_roles": preferences.preferred_roles or [],
-            "preferred_locations": preferences.preferred_locations or [],
+            "preferred_roles": parse_comma_separated(preferences.preferred_roles),
+            "preferred_locations": parse_comma_separated(preferences.preferred_locations),
             "salary_min": preferences.salary_min,
             "salary_max": preferences.salary_max,
             "remote_preference": preferences.remote_preference,

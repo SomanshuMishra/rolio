@@ -75,12 +75,24 @@ class JSearchClient:
             if remote:
                 params["remote_jobs_only"] = remote
 
+            # Log the request details
+            headers = self._get_headers()
+            logger.info(f"\n>>> JSearch API Request:")
+            logger.info(f"    URL: {self.BASE_URL}{self.ENDPOINTS['search']}")
+            logger.info(f"    Params: {params}")
+            logger.info(f"    Headers: x-rapidapi-key={headers.get('x-rapidapi-key', 'NOT SET')}")
+            logger.info(f"            x-rapidapi-host={headers.get('x-rapidapi-host', 'NOT SET')}")
+
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
                     f"{self.BASE_URL}{self.ENDPOINTS['search']}",
                     params=params,
-                    headers=self._get_headers(),
+                    headers=headers,
                 )
+
+                logger.info(f"\n<<< JSearch API Response:")
+                logger.info(f"    Status: {response.status_code}")
+                logger.info(f"    Response: {response.text[:500]}")  # Log first 500 chars
 
                 if response.status_code == 429:
                     raise ValueError("JSearch API rate limit exceeded")
@@ -93,9 +105,11 @@ class JSearchClient:
                 data = response.json()
                 jobs = data.get("data", [])
 
+                logger.info(f"    Total jobs in response: {len(jobs)}")
+
                 # Transform JSearch response to our format
                 formatted_jobs = [self._format_job(job) for job in jobs[:limit]]
-                logger.info(f"Retrieved {len(formatted_jobs)} jobs from JSearch")
+                logger.info(f"    Formatted jobs: {len(formatted_jobs)}")
 
                 return formatted_jobs
 
@@ -105,6 +119,11 @@ class JSearchClient:
 
     def _format_job(self, raw_job: Dict[str, Any]) -> Dict[str, Any]:
         """Transform JSearch job data to our internal format."""
+        # Extract requirements as list
+        requirements_list = self._extract_requirements(raw_job)
+        # Convert to comma-separated string for SQLite compatibility
+        requirements_str = ",".join(requirements_list) if requirements_list else ""
+
         return {
             "jsearch_id": raw_job.get("job_id"),
             "title": raw_job.get("job_title"),
@@ -114,7 +133,7 @@ class JSearchClient:
             "salary_min": self._extract_salary_min(raw_job),
             "salary_max": self._extract_salary_max(raw_job),
             "description": raw_job.get("job_description"),
-            "requirements": self._extract_requirements(raw_job),
+            "requirements": requirements_str,
             "apply_url": raw_job.get("job_apply_link") or raw_job.get("job_apply_is_direct_link_to_job_post"),
             "posted_at": self._parse_date(raw_job.get("job_posted_at_datetime_utc")),
             "source": "jsearch",
@@ -202,6 +221,10 @@ async def cache_jobs(
                 existing.expires_at = expires_at
             else:
                 # Create new cache entry
+                # Convert requirements list to comma-separated string if needed
+                requirements = job_data.get("requirements", [])
+                requirements_str = requirements if isinstance(requirements, str) else ",".join(str(r).strip() for r in requirements if r) if requirements else ""
+
                 job = Job(
                     jsearch_id=job_data["jsearch_id"],
                     title=job_data.get("title"),
@@ -211,7 +234,7 @@ async def cache_jobs(
                     salary_min=job_data.get("salary_min"),
                     salary_max=job_data.get("salary_max"),
                     description=job_data.get("description"),
-                    requirements=job_data.get("requirements", []),
+                    requirements=requirements_str,
                     apply_url=job_data.get("apply_url"),
                     posted_at=job_data.get("posted_at"),
                     source="jsearch",
