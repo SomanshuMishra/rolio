@@ -477,6 +477,12 @@ export default function JobsPage() {
                     const scoreColor = match.match_score >= 75 ? 'from-emerald-400 to-green-400' :
                                       match.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
                                       'from-red-400 to-rose-400'
+                    const accentBg = match.match_score >= 75 ? 'bg-gradient-to-r from-emerald-400 to-green-400' :
+                                    match.match_score >= 60 ? 'bg-gradient-to-r from-amber-400 to-yellow-400' :
+                                    'bg-gradient-to-r from-red-400 to-rose-400'
+                    const glowColor = match.match_score >= 75 ? 'shadow-emerald-300/40' :
+                                     match.match_score >= 60 ? 'shadow-amber-300/40' :
+                                     'shadow-red-300/40'
                     const isSelected = selectedJob?.match_id === match.match_id
 
                     return (
@@ -489,14 +495,36 @@ export default function JobsPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`w-full p-4 rounded-xl text-left transition-all ${
+                        className={`w-full rounded-xl text-left transition-all overflow-hidden relative group ${
                           isSelected
-                            ? 'bg-gradient-to-r from-pink-300 to-purple-300 text-white shadow-lg border-2 border-pink-400'
-                            : 'bg-white border-2 border-gray-100 hover:border-purple-200 hover:shadow-md'
+                            ? `bg-gradient-to-r from-pink-300 to-purple-300 text-white shadow-lg`
+                            : `bg-white hover:shadow-xl ${glowColor}`
                         }`}
+                        style={isSelected ? undefined : {
+                          boxShadow: `0 4px 20px var(--tw-shadow-color)`,
+                          '--tw-shadow-color': match.match_score >= 75 ? 'rgb(52, 211, 153, 0.2)' :
+                                             match.match_score >= 60 ? 'rgb(251, 191, 36, 0.2)' :
+                                             'rgb(248, 113, 113, 0.2)'
+                        } as React.CSSProperties}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br ${scoreColor} flex items-center justify-center`}>
+                        {/* Top Accent Bar */}
+                        <div className={`absolute top-0 left-0 right-0 h-1 ${accentBg}`} />
+
+                        {/* Gradient Border Effect */}
+                        <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`}
+                          style={{
+                            border: '2px solid transparent',
+                            backgroundImage: isSelected ? undefined : `linear-gradient(135deg, ${
+                              match.match_score >= 75 ? 'rgb(52, 211, 153, 0.5)' :
+                              match.match_score >= 60 ? 'rgb(251, 191, 36, 0.5)' :
+                              'rgb(248, 113, 113, 0.5)'
+                            }, rgba(255,255,255,0))`,
+                            backgroundClip: 'padding-box',
+                          }}
+                        />
+
+                        <div className="p-4 relative z-10 flex items-start gap-3">
+                          <div className={`flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br ${scoreColor} flex items-center justify-center shadow-md`}>
                             <span className="text-sm font-black text-white">{Math.round(match.match_score)}</span>
                           </div>
                           <div className="flex-1 min-w-0">
@@ -525,9 +553,26 @@ export default function JobsPage() {
                   className="hidden md:flex flex-1 flex-col"
                 >
                   {selectedJob ? (
-                    <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-8 overflow-y-auto h-full sticky top-0">
-                      {/* Score and Title */}
-                      <div className="flex items-start gap-6 mb-8">
+                    <div className={`bg-white rounded-2xl overflow-hidden h-full sticky top-0 flex flex-col`}
+                      style={{
+                        boxShadow: selectedJob.match_score >= 75 ? '0 20px 40px rgba(52, 211, 153, 0.15)' :
+                                  selectedJob.match_score >= 60 ? '0 20px 40px rgba(251, 191, 36, 0.15)' :
+                                  '0 20px 40px rgba(248, 113, 113, 0.15)',
+                        borderLeft: selectedJob.match_score >= 75 ? '8px solid rgb(52, 211, 153)' :
+                                   selectedJob.match_score >= 60 ? '8px solid rgb(251, 191, 36)' :
+                                   '8px solid rgb(248, 113, 113)',
+                      }}
+                    >
+                      {/* Top Accent Bar */}
+                      <div className={`h-3 bg-gradient-to-r ${
+                        selectedJob.match_score >= 75 ? 'from-emerald-400 to-green-400' :
+                        selectedJob.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
+                        'from-red-400 to-rose-400'
+                      }`} />
+
+                      <div className="p-8 overflow-y-auto flex-1">
+                        {/* Score and Title */}
+                        <div className="flex items-start gap-6 mb-8">
                         <div className={`flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-br ${
                           selectedJob.match_score >= 75 ? 'from-emerald-400 to-green-400' :
                           selectedJob.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
@@ -601,6 +646,7 @@ export default function JobsPage() {
                       >
                         Apply Now →
                       </motion.a>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-full">
@@ -626,8 +672,20 @@ export default function JobsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 400 }}
                       transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                      className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 md:hidden max-h-[90vh] overflow-y-auto"
+                      className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 md:hidden max-h-[90vh] overflow-hidden flex flex-col"
+                      style={{
+                        borderLeft: selectedJob.match_score >= 75 ? '8px solid rgb(52, 211, 153)' :
+                                   selectedJob.match_score >= 60 ? '8px solid rgb(251, 191, 36)' :
+                                   '8px solid rgb(248, 113, 113)',
+                      }}
                     >
+                      {/* Top Accent Bar */}
+                      <div className={`h-2 bg-gradient-to-r ${
+                        selectedJob.match_score >= 75 ? 'from-emerald-400 to-green-400' :
+                        selectedJob.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
+                        'from-red-400 to-rose-400'
+                      }`} />
+
                       {/* Close Button */}
                       <div className="sticky top-0 bg-white border-b-2 border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
                         <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto" />
@@ -640,7 +698,7 @@ export default function JobsPage() {
                         </motion.button>
                       </div>
 
-                      <div className="p-6 space-y-6">
+                      <div className="p-6 space-y-6 overflow-y-auto flex-1">
                         {/* Score and Title */}
                         <div className="flex items-start gap-4">
                           <div className={`flex-shrink-0 w-20 h-20 rounded-full bg-gradient-to-br ${
