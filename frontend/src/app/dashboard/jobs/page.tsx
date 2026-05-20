@@ -41,7 +41,6 @@ export default function JobsPage() {
 
   // Search state
   const [searchInProgress, setSearchInProgress] = useState(false)
-  const [currentSearchId, setCurrentSearchId] = useState<string | null>(null)
   const [searchStatus, setSearchStatus] = useState<SearchStatus | null>(null)
   const [searchResults, setSearchResults] = useState<JobMatch[]>([])
 
@@ -49,7 +48,6 @@ export default function JobsPage() {
   useEffect(() => {
     const urlSearchId = searchParams.get('search_id')
     if (urlSearchId) {
-      setCurrentSearchId(urlSearchId)
       setSearchInProgress(true)
       setSearchStatus({ search_id: urlSearchId, status: 'pending', total_jobs_searched: 0, total_matches: 0 })
       startPolling(urlSearchId)
@@ -186,7 +184,6 @@ export default function JobsPage() {
       const data = await response.json()
       const searchId = data.search_id
 
-      setCurrentSearchId(searchId)
       setSearchStatus({ search_id: searchId, status: 'pending', total_jobs_searched: 0, total_matches: 0 })
 
       // Request notification permission
