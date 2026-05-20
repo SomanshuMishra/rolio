@@ -25,6 +25,7 @@ interface NavItem {
   icon: LucideIcon
   badge?: string
   status?: boolean
+  color?: string
 }
 
 interface NavSection {
@@ -36,17 +37,17 @@ const NAVIGATION_SECTIONS: NavSection[] = [
   {
     label: 'DISCOVER',
     items: [
-      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-      { name: 'Jobs', href: '/dashboard/jobs', icon: Briefcase, badge: 'jobs' },
-      { name: 'Saved', href: '/dashboard/saved', icon: Heart, badge: 'saved' },
+      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'bg-gradient-to-br from-blue-300 to-cyan-300' },
+      { name: 'Jobs', href: '/dashboard/jobs', icon: Briefcase, badge: 'jobs', color: 'bg-gradient-to-br from-pink-300 to-rose-300' },
+      { name: 'Saved', href: '/dashboard/saved', icon: Heart, badge: 'saved', color: 'bg-gradient-to-br from-red-300 to-pink-300' },
     ],
   },
   {
     label: 'ACCOUNT',
     items: [
-      { name: 'Resume', href: '/dashboard/resume', icon: FileText, status: true },
-      { name: 'Profile', href: '/dashboard/profile', icon: User },
-      { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+      { name: 'Resume', href: '/dashboard/resume', icon: FileText, status: true, color: 'bg-gradient-to-br from-yellow-300 to-amber-300' },
+      { name: 'Profile', href: '/dashboard/profile', icon: User, color: 'bg-gradient-to-br from-purple-300 to-violet-300' },
+      { name: 'Settings', href: '/dashboard/settings', icon: Settings, color: 'bg-gradient-to-br from-green-300 to-emerald-300' },
     ],
   },
 ]
@@ -103,18 +104,18 @@ export default function Sidebar() {
 
   return (
     <motion.aside
-      className="fixed left-0 top-0 h-screen bg-[#0a0a0f] border-r border-white/[0.06] backdrop-blur-xl"
+      className="fixed left-0 top-0 h-screen bg-white/95 border-r border-pink-100 backdrop-blur-xl"
       animate={{ width: isCollapsed ? 68 : 260 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
       {/* Logo Section */}
       <motion.div
-        className="p-4 border-b border-white/[0.06] h-20 flex items-center justify-between"
+        className="p-4 border-b border-pink-100 h-20 flex items-center justify-between bg-gradient-to-r from-white via-pink-50 to-white"
         layout
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-400 to-purple-300 flex items-center justify-center flex-shrink-0">
-            <span className="text-[#0f172a] font-display font-bold">R</span>
+            <span className="text-white font-display font-bold text-lg">R</span>
           </div>
           <AnimatePresence mode="wait">
             {!isCollapsed && (
@@ -132,14 +133,14 @@ export default function Sidebar() {
 
         <motion.button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-white/[0.08] transition-colors flex-shrink-0"
+          className="p-1.5 rounded-lg hover:bg-purple-100 transition-colors flex-shrink-0"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
           {isCollapsed ? (
-            <ChevronRight size={18} className="text-[#0f172a]/60" />
+            <ChevronRight size={18} className="text-purple-500" />
           ) : (
-            <ChevronLeft size={18} className="text-[#0f172a]/60" />
+            <ChevronLeft size={18} className="text-purple-500" />
           )}
         </motion.button>
       </motion.div>
@@ -156,14 +157,14 @@ export default function Sidebar() {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#0f172a]/20 mb-3 px-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-purple-400 mb-3 px-3">
                     {section.label}
                   </p>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {section.items.map((item, idx) => {
                 const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
                 const Icon = item.icon
@@ -178,27 +179,18 @@ export default function Sidebar() {
                     <Link href={item.href}>
                       <motion.div
                         className={`relative px-3 py-2.5 rounded-lg cursor-pointer flex items-center gap-3 transition-all duration-200 group ${
-                          isActive ? 'bg-white/[0.08]' : 'hover:bg-white/[0.04]'
+                          isActive
+                            ? `${item.color} shadow-md text-white`
+                            : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
                         }`}
                         whileTap={{ scale: 0.96 }}
                       >
-                        {/* Active indicator */}
-                        <AnimatePresence>
-                          {isActive && (
-                            <motion.div
-                              layoutId="activeNav"
-                              className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-indigo-500 to-violet-500 rounded-r"
-                              transition={{ duration: 0.2 }}
-                            />
-                          )}
-                        </AnimatePresence>
-
                         {/* Icon */}
                         <div className="relative flex-shrink-0">
                           <Icon
                             size={20}
                             className={`transition-colors duration-200 ${
-                              isActive ? 'text-pink-400' : 'text-[#0f172a]/50 group-hover:text-[#0f172a]/70'
+                              isActive ? 'text-white' : 'text-gray-600 group-hover:text-gray-900'
                             }`}
                           />
                         </div>
@@ -215,7 +207,7 @@ export default function Sidebar() {
                             >
                               <span
                                 className={`text-sm font-medium truncate transition-colors duration-200 ${
-                                  isActive ? 'text-[#0f172a]' : 'text-[#0f172a]/70'
+                                  isActive ? 'text-white' : 'text-gray-700'
                                 }`}
                               >
                                 {item.name}
@@ -235,7 +227,11 @@ export default function Sidebar() {
 
                               {item.badge && badgeCounts[item.badge as keyof typeof badgeCounts] > 0 && (
                                 <motion.span
-                                  className="ml-2 px-2 py-0.5 bg-indigo-600/30 text-indigo-300 text-xs font-semibold rounded-full flex-shrink-0"
+                                  className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full flex-shrink-0 ${
+                                    isActive
+                                      ? 'bg-white/30 text-white'
+                                      : 'bg-pink-200 text-pink-700'
+                                  }`}
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
                                   transition={{ delay: 0.3 }}
@@ -257,10 +253,10 @@ export default function Sidebar() {
       </nav>
 
       {/* User Section */}
-      <motion.div className="border-t border-white/[0.06] p-3 space-y-2">
-        <motion.div className="px-3 py-2.5 rounded-lg bg-white/[0.03] flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-bold text-[#0f172a]">{userName.charAt(0).toUpperCase()}</span>
+      <motion.div className="border-t border-pink-100 p-3 space-y-2 bg-gradient-to-t from-pink-50 to-white">
+        <motion.div className="px-3 py-2.5 rounded-lg bg-gradient-to-r from-purple-300 to-violet-300 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+            <span className="text-xs font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">{userName.charAt(0).toUpperCase()}</span>
           </div>
           <AnimatePresence mode="wait">
             {!isCollapsed && (
@@ -271,8 +267,8 @@ export default function Sidebar() {
                 exit={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <p className="text-xs font-medium text-[#0f172a] truncate">{userName}</p>
-                <p className="text-[10px] text-[#0f172a]/40">Tech Professional</p>
+                <p className="text-xs font-medium text-white truncate">{userName}</p>
+                <p className="text-[10px] text-white/80">Tech Professional</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -280,7 +276,7 @@ export default function Sidebar() {
 
         <motion.button
           onClick={handleLogout}
-          className="w-full px-3 py-2.5 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-300 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+          className="w-full px-3 py-2.5 rounded-lg bg-gradient-to-r from-red-400 to-rose-400 hover:from-red-500 hover:to-rose-500 text-white text-sm font-medium flex items-center justify-center gap-2 transition-all shadow-md"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.96 }}
         >
