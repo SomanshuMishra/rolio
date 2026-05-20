@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
+import * as XLSX from 'xlsx'
 
 const MIN_MATCH_SCORE = 60
 
@@ -200,38 +201,45 @@ export default function JobsPage() {
     }
   }
 
-  const handleDownloadExcel = async () => {
-    if (!currentSearchId && !searchResults.length) return
+  const handleDownloadExcel = () => {
+    if (!searchResults.length) return
 
     try {
-      const token = localStorage.getItem('access_token')
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      // Prepare data for Excel
+      const excelData = searchResults.map((match, index) => ({
+        'Rank': index + 1,
+        'Job Title': match.job.title,
+        'Company': match.job.company,
+        'Location': match.job.location,
+        'Remote': match.job.is_remote ? 'Yes' : 'No',
+        'Match %': `${Math.round(match.match_score)}%`,
+        'Salary Min': match.job.salary_min || '',
+        'Salary Max': match.job.salary_max || '',
+        'Why Matched': match.match_reasons.slice(0, 3).join('; '),
+        'Apply URL': match.job.apply_url,
+      }))
 
-      // If currentSearchId is null (old cached matches), fetch all matches
-      let downloadUrl = ''
-      if (currentSearchId && currentSearchId !== 'cached') {
-        downloadUrl = `${apiUrl}/api/jobs/search-results/${currentSearchId}/export?min_score=${MIN_MATCH_SCORE}`
-      } else {
-        downloadUrl = `${apiUrl}/api/jobs/matches/export?limit=1000&min_score=${MIN_MATCH_SCORE}`
-      }
+      // Create workbook and worksheet
+      const ws = XLSX.utils.json_to_sheet(excelData)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Job Matches')
 
-      const response = await fetch(downloadUrl, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      // Adjust column widths
+      ws['!cols'] = [
+        { wch: 6 },   // Rank
+        { wch: 35 },  // Job Title
+        { wch: 20 },  // Company
+        { wch: 20 },  // Location
+        { wch: 8 },   // Remote
+        { wch: 10 },  // Match %
+        { wch: 12 },  // Salary Min
+        { wch: 12 },  // Salary Max
+        { wch: 40 },  // Why Matched
+        { wch: 50 },  // Apply URL
+      ]
 
-      if (!response.ok) {
-        throw new Error('Download failed')
-      }
-
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `rolio_job_matches_${currentSearchId?.slice(0, 8) || 'all'}.xlsx`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      // Download file
+      XLSX.writeFile(wb, `rolio_job_matches_${new Date().toISOString().split('T')[0]}.xlsx`)
     } catch (error) {
       console.error('Failed to download Excel:', error)
     }
