@@ -102,9 +102,13 @@ class JobMatcher:
                     base_score = (similarity + 1) / 2 * 100
                     logger.info(f"      • Embedding similarity: {base_score:.1f}")
 
-                    # Apply AI analysis for detailed reasoning
-                    analysis = await self.ai_provider.analyze_match(resume_data, job)
-                    logger.info(f"      ✓ AI analysis complete: {len(analysis.get('reasons', []))} reasons")
+                    # Apply AI analysis for detailed reasoning (with fallback)
+                    try:
+                        analysis = await self.ai_provider.analyze_match(resume_data, job)
+                        logger.info(f"      ✓ AI analysis complete: {len(analysis.get('reasons', []))} reasons")
+                    except Exception as analysis_error:
+                        logger.warning(f"AI analysis failed, using fallback: {analysis_error}")
+                        analysis = self._fallback_analysis(resume_data, job, base_score)
 
                     # Combine scores
                     final_score = self._calculate_final_score(
@@ -332,3 +336,41 @@ class JobMatcher:
             parts.append(f"Requirements: {', '.join(job.get('requirements', [])[:10])}")
 
         return "\n".join(parts)
+
+    def _fallback_analysis(
+        self,
+        resume_data: Dict[str, Any],
+        job: Dict[str, Any],
+        embedding_score: float,
+    ) -> Dict[str, Any]:
+        """Fallback analysis when AI API fails. Uses simple heuristics."""
+        resume_skills = resume_data.get("skills", [])
+        job_skills = self._extract_skills_from_job(job)
+
+        # Count matching skills
+        matching_skills = [
+            skill for skill in job_skills
+            if any(skill.lower() in str(res_skill).lower() or str(res_skill).lower() in skill.lower()
+                   for res_skill in resume_skills)
+        ]
+
+        # Generate reasons based on heuristics
+        reasons = []
+        if matching_skills:
+            reasons.append(f"Skills match: {', '.join(matching_skills[:3])}")
+        if "remote" in job.get("location", "").lower() or job.get("is_remote"):
+            reasons.append("Position is remote-friendly")
+        if job.get("company"):
+            reasons.append(f"Position at {job.get('company')}")
+
+        if not reasons:
+            reasons = ["Position matches general requirements"]
+
+        return {
+            "match_score": round(embedding_score),
+            "matching_skills": matching_skills,
+            "reasons": reasons[:5],
+            "role_match_confidence": 0.7,
+            "location_penalty": 0.0,
+            "salary_penalty": 0.0,
+        }

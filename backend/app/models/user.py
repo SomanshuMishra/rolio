@@ -32,9 +32,10 @@ class APIKey(Base):
 
     id = Column(ID_TYPE, primary_key=True, default=ID_DEFAULT)
     user_id = Column(ID_TYPE, nullable=False, index=True)
-    provider = Column(String(50), nullable=False)  # 'openai' or 'anthropic'
+    provider = Column(String(50), nullable=False)  # 'openai', 'anthropic', 'google', 'groq', 'grok'
     encrypted_key = Column(String(500), nullable=False)
     model_preference = Column(String(255))
+    is_default = Column(Boolean, default=False, nullable=False)  # Only one key per user can be default
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     __table_args__ = (

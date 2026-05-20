@@ -26,8 +26,10 @@ export default function SettingsPage() {
   })
 
   const [apiKey, setApiKey] = useState('')
-  const [apiProvider, setApiProvider] = useState('openai')
+  const [apiProvider, setApiProvider] = useState('google')
+  const [modelPreference, setModelPreference] = useState('')
   const [existingKeys, setExistingKeys] = useState<any[]>([])
+  const [settingDefault, setSettingDefault] = useState<string | null>(null)
 
   // Load existing data
   useEffect(() => {
@@ -90,18 +92,49 @@ export default function SettingsPage() {
         params: {
           provider: apiProvider,
           api_key: apiKey,
+          model_preference: modelPreference || undefined,
+          is_default: existingKeys.length === 0, // Set as default if first key
         },
       })
 
       addToast(`${apiProvider} API key saved successfully!`, 'success')
       setApiKey('')
-      setExistingKeys([...existingKeys, response.data])
+      setModelPreference('')
+      // Update existing key or add new one
+      const existingIndex = existingKeys.findIndex((k) => k.provider === apiProvider)
+      if (existingIndex >= 0) {
+        const updated = [...existingKeys]
+        updated[existingIndex] = response.data
+        setExistingKeys(updated)
+      } else {
+        setExistingKeys([...existingKeys, response.data])
+      }
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || 'Failed to save API key'
       addToast(errorMsg, 'error')
       console.error('Error:', error)
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleSetDefault = async (provider: string) => {
+    setSettingDefault(provider)
+    try {
+      await api.put(`/api/profile/api-keys/${provider}/default`)
+      addToast(`${provider} set as default provider`, 'success')
+      // Update all keys
+      const updated = existingKeys.map((k) => ({
+        ...k,
+        is_default: k.provider === provider,
+      }))
+      setExistingKeys(updated)
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.detail || 'Failed to set default'
+      addToast(errorMsg, 'error')
+      console.error('Error:', error)
+    } finally {
+      setSettingDefault(null)
     }
   }
 
@@ -238,19 +271,40 @@ export default function SettingsPage() {
             {/* Existing API Keys */}
             {existingKeys.length > 0 && (
               <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-green-400 mb-2">✓ Active API Keys:</p>
+                <p className="text-sm text-green-400 mb-3">✓ Active API Keys:</p>
                 {existingKeys.map((key) => (
-                  <div key={key.provider} className="flex justify-between items-center text-sm mb-2 last:mb-0">
-                    <span className="capitalize">
-                      {key.provider} {key.key_preview}
-                    </span>
-                    <motion.button
-                      onClick={() => handleDeleteApiKey(key.provider)}
-                      className="text-xs px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded"
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      Remove
-                    </motion.button>
+                  <div key={key.provider} className="flex items-center justify-between text-sm mb-3 last:mb-0 p-3 bg-white/5 rounded">
+                    <div className="flex-1">
+                      <div className="capitalize font-medium">
+                        {key.provider} {key.key_preview}
+                      </div>
+                      {key.model_preference && (
+                        <div className="text-xs text-gray-400 mt-1">Model: {key.model_preference}</div>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {key.is_default ? (
+                        <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">
+                          📌 Default
+                        </span>
+                      ) : (
+                        <motion.button
+                          onClick={() => handleSetDefault(key.provider)}
+                          disabled={settingDefault === key.provider}
+                          className="text-xs px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded disabled:opacity-50"
+                          whileHover={{ scale: 1.05 }}
+                        >
+                          Set Default
+                        </motion.button>
+                      )}
+                      <motion.button
+                        onClick={() => handleDeleteApiKey(key.provider)}
+                        className="text-xs px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        Remove
+                      </motion.button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -264,8 +318,11 @@ export default function SettingsPage() {
                   onChange={(e) => setApiProvider(e.target.value)}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
                 >
-                  <option value="google">Google Gemini - Free & Recommended ⭐</option>
-                  <option value="groq">Groq - Free & Super Fast ⚡</option>
+                  <option value="google">Google Gemini ⭐ Free & Recommended</option>
+                  <option value="groq">Groq ⚡ Free & Super Fast</option>
+                  <option value="openai">OpenAI - GPT-4</option>
+                  <option value="anthropic">Claude (Anthropic)</option>
+                  <option value="grok">Grok (X.AI)</option>
                 </select>
               </div>
 
@@ -279,6 +336,18 @@ export default function SettingsPage() {
                   placeholder="sk-••••••••••••••••"
                 />
                 <p className="text-xs text-gray-400 mt-2">🔒 Encrypted with AES-256, never shared</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Model Preference (Optional)</label>
+                <input
+                  type="text"
+                  value={modelPreference}
+                  onChange={(e) => setModelPreference(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                  placeholder="e.g., gpt-4, claude-3-sonnet"
+                />
+                <p className="text-xs text-gray-400 mt-2">Specify which model to use for this provider (optional)</p>
               </div>
 
               <motion.button
@@ -296,38 +365,65 @@ export default function SettingsPage() {
       </motion.div>
 
       {/* API Setup Guide Modal */}
-      <Modal isOpen={showApiGuide} onClose={() => setShowApiGuide(false)} title="Get Your Free API Key in 5 Minutes">
-        <div className="space-y-4 text-sm">
+      <Modal isOpen={showApiGuide} onClose={() => setShowApiGuide(false)} title="Get Your API Key for Any Provider">
+        <div className="space-y-4 text-sm max-h-[600px] overflow-y-auto">
           <div>
-            <h3 className="font-semibold text-green-400 mb-2">⭐ Recommended: Google Gemini (Completely Free)</h3>
-            <p className="text-xs text-gray-400 mb-2">60 requests/minute • No credit card needed • Truly free forever</p>
-            <ol className="list-decimal list-inside space-y-2 text-gray-300">
+            <h3 className="font-semibold text-green-400 mb-2">⭐ Google Gemini (Completely Free - Recommended)</h3>
+            <p className="text-xs text-gray-400 mb-2">60 requests/minute • Web search grounding • No credit card needed</p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
               <li>Visit <span className="font-mono text-blue-300">aistudio.google.com/app/apikey</span></li>
               <li>Click "Get API Key" button</li>
               <li>Click "Create API key in new project"</li>
-              <li>Copy your new API key</li>
-              <li>Paste it above in the API Key field</li>
-              <li>Click "Save API Key"</li>
-              <li>Ready! Start searching jobs</li>
+              <li>Copy and paste above</li>
             </ol>
           </div>
 
-          <div className="border-t border-white/10 pt-4">
-            <h3 className="font-semibold text-yellow-400 mb-2">⚡ Alternative: Groq (Also Free & Super Fast)</h3>
-            <p className="text-xs text-gray-400 mb-2">30 requests/minute • Extremely fast responses • No credit card needed</p>
-            <ol className="list-decimal list-inside space-y-2 text-gray-300">
+          <div className="border-t border-white/10 pt-3">
+            <h3 className="font-semibold text-yellow-400 mb-2">⚡ Groq (Free & Lightning Fast)</h3>
+            <p className="text-xs text-gray-400 mb-2">30 requests/minute • Extremely fast inference • No credit card needed</p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
               <li>Visit <span className="font-mono text-blue-300">console.groq.com</span></li>
               <li>Sign up with email (free)</li>
               <li>Go to API Keys section</li>
-              <li>Create new key and copy it</li>
-              <li>Select "Groq" in the dropdown above</li>
-              <li>Paste and save your key</li>
-              <li>Experience lightning-fast job matching</li>
+              <li>Create new key and copy</li>
             </ol>
           </div>
 
-          <p className="text-xs text-gray-400 pt-4 border-t border-white/10">
-            💡 Both options are completely free with no credit card required. Choose one and get started!
+          <div className="border-t border-white/10 pt-3">
+            <h3 className="font-semibold text-blue-400 mb-2">💬 OpenAI (GPT-4, Paid)</h3>
+            <p className="text-xs text-gray-400 mb-2">Pay-as-you-go • Highly capable • API keys at platform.openai.com</p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
+              <li>Visit <span className="font-mono text-blue-300">platform.openai.com/api-keys</span></li>
+              <li>Create new secret key</li>
+              <li>Select OpenAI in dropdown above</li>
+              <li>Paste your key</li>
+            </ol>
+          </div>
+
+          <div className="border-t border-white/10 pt-3">
+            <h3 className="font-semibold text-purple-400 mb-2">🧠 Claude/Anthropic (Paid)</h3>
+            <p className="text-xs text-gray-400 mb-2">State-of-the-art • Great for analysis • API keys at console.anthropic.com</p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
+              <li>Visit <span className="font-mono text-blue-300">console.anthropic.com/keys</span></li>
+              <li>Create new API key</li>
+              <li>Select Anthropic in dropdown</li>
+              <li>Paste your key</li>
+            </ol>
+          </div>
+
+          <div className="border-t border-white/10 pt-3">
+            <h3 className="font-semibold text-red-400 mb-2">🚀 Grok/X.AI (Paid)</h3>
+            <p className="text-xs text-gray-400 mb-2">Real-time data • Powerful reasoning • API keys at console.x.ai</p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
+              <li>Visit <span className="font-mono text-blue-300">console.x.ai</span></li>
+              <li>Create new API key</li>
+              <li>Select Grok in dropdown</li>
+              <li>Paste your key</li>
+            </ol>
+          </div>
+
+          <p className="text-xs text-gray-400 pt-3 border-t border-white/10">
+            💡 Start with free options (Gemini or Groq). Only one default provider is used for job matching.
           </p>
         </div>
       </Modal>

@@ -30,6 +30,7 @@ class APIKeyResponse:
         self.id = str(api_key.id)
         self.provider = api_key.provider
         self.model_preference = api_key.model_preference
+        self.is_default = api_key.is_default
         self.created_at = api_key.created_at
         self.key_preview = get_api_key_preview(decrypt_api_key(api_key.encrypted_key) or "")
 
@@ -93,15 +94,16 @@ def add_api_key(
     provider: str,
     api_key: str,
     model_preference: str = None,
+    is_default: bool = False,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Add encrypted API key for OpenAI or Claude."""
+    """Add encrypted API key for any supported provider."""
     try:
-        if provider.lower() not in ["openai", "anthropic", "google", "groq"]:
+        if provider.lower() not in ["openai", "anthropic", "google", "groq", "grok"]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Provider must be 'openai', 'anthropic', 'google', or 'groq'",
+                detail="Provider must be 'openai', 'anthropic', 'google', 'groq', or 'grok'",
             )
 
         if not api_key or len(api_key) < 10:
@@ -109,6 +111,14 @@ def add_api_key(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid API key format",
             )
+
+        # If setting as default, unset all other defaults
+        if is_default:
+            db.query(APIKey).filter(
+                APIKey.user_id == current_user.id,
+                APIKey.is_default == True,
+            ).update({APIKey.is_default: False})
+            db.commit()
 
         # Check if key already exists for this provider
         existing = db.query(APIKey).filter(
@@ -123,6 +133,7 @@ def add_api_key(
             # Update existing key
             existing.encrypted_key = encrypted_key
             existing.model_preference = model_preference
+            existing.is_default = is_default
             db.commit()
             db.refresh(existing)
             api_key_record = existing
@@ -134,6 +145,7 @@ def add_api_key(
                 provider=provider.lower(),
                 encrypted_key=encrypted_key,
                 model_preference=model_preference,
+                is_default=is_default,
             )
             db.add(api_key_record)
             db.commit()
@@ -144,6 +156,7 @@ def add_api_key(
             "id": str(api_key_record.id),
             "provider": api_key_record.provider,
             "model_preference": api_key_record.model_preference,
+            "is_default": api_key_record.is_default,
             "created_at": api_key_record.created_at,
             "key_preview": get_api_key_preview(api_key),
         }
@@ -151,11 +164,13 @@ def add_api_key(
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
         logger.error(f"Error adding API key: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to add API key",
+            detail=f"Failed to add API key: {str(e)}",
         )
 
 
@@ -196,6 +211,58 @@ def delete_api_key(
         )
 
 
+@router.put("/api-keys/{provider}/default")
+def set_default_api_key(
+    provider: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Set an API key as the default for job searching."""
+    try:
+        api_key = db.query(APIKey).filter(
+            APIKey.user_id == current_user.id,
+            APIKey.provider == provider.lower(),
+        ).first()
+
+        if not api_key:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No API key found for {provider}",
+            )
+
+        # Unset all other defaults for this user
+        db.query(APIKey).filter(
+            APIKey.user_id == current_user.id,
+            APIKey.is_default == True,
+        ).update({APIKey.is_default: False})
+
+        # Set this key as default
+        api_key.is_default = True
+        db.commit()
+        db.refresh(api_key)
+
+        logger.info(f"Set {provider} as default API key for user {current_user.id}")
+
+        return {
+            "id": str(api_key.id),
+            "provider": api_key.provider,
+            "model_preference": api_key.model_preference,
+            "is_default": api_key.is_default,
+            "created_at": api_key.created_at,
+            "key_preview": get_api_key_preview(decrypt_api_key(api_key.encrypted_key) or ""),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error setting default API key: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to set default API key",
+        )
+
+
 @router.get("/api-keys")
 def list_api_keys(
     current_user: User = Depends(get_current_user),
@@ -212,8 +279,10 @@ def list_api_keys(
             decrypted = decrypt_api_key(key.encrypted_key)
             keys_data.append(
                 {
+                    "id": str(key.id),
                     "provider": key.provider,
                     "model_preference": key.model_preference,
+                    "is_default": key.is_default,
                     "created_at": key.created_at,
                     "key_preview": get_api_key_preview(decrypted or ""),
                 }

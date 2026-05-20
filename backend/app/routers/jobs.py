@@ -95,14 +95,21 @@ async def search_and_match_jobs(
         logger.info(f"     - Salary: {preferences.salary_min} - {preferences.salary_max}")
         logger.info(f"     - Remote: {preferences.remote_preference}")
 
-        # Get user's API key (most recent one)
-        logger.info(f"3. Checking for API key...")
+        # Get user's default API key
+        logger.info(f"3. Checking for default API key...")
         # Expunge any stale session objects
         db.expunge_all()
 
         api_key_record = db.query(APIKey).filter(
             APIKey.user_id == current_user.id,
-        ).order_by(APIKey.created_at.desc()).first()
+            APIKey.is_default == True,
+        ).first()
+
+        if not api_key_record:
+            logger.warning(f"   ⚠ No default API key found, trying any available key...")
+            api_key_record = db.query(APIKey).filter(
+                APIKey.user_id == current_user.id,
+            ).order_by(APIKey.created_at.desc()).first()
 
         if not api_key_record:
             logger.error(f"   ❌ No API key found for user {current_user.id}")
@@ -110,7 +117,7 @@ async def search_and_match_jobs(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No AI provider API key configured. Please add your OpenAI or Claude API key.",
             )
-        logger.info(f"   ✓ API key found: {api_key_record.provider}")
+        logger.info(f"   ✓ API key found: {api_key_record.provider} (default={api_key_record.is_default})")
 
         # Decrypt API key
         api_key = decrypt_api_key(api_key_record.encrypted_key)
@@ -123,7 +130,14 @@ async def search_and_match_jobs(
         # Clean up expired cache
         cleanup_expired_jobs(db)
 
-        # Get or fetch jobs
+        # Get or fetch jobs from multiple sources
+        from ..services.job_discovery import (
+            fetch_remoteok_jobs,
+            fetch_jsearch_smart_queries,
+            fetch_gemini_web_jobs,
+            merge_and_dedupe_jobs,
+        )
+
         jobs = []
         if not request.force_refresh:
             # Try to get from cache first
@@ -145,12 +159,14 @@ async def search_and_match_jobs(
                 for j in cached_jobs
             ]
 
-        # If not enough cached jobs, fetch using Gemini web search
+        # If not enough cached jobs, fetch from multiple sources
         logger.info(f"4. Cached jobs: {len(jobs)}, need: {request.limit * 2}")
-        if len(jobs) < request.limit * 2 and api_key_record.provider == "google":
+        if len(jobs) < request.limit * 2 or request.force_refresh:
             try:
-                # Parse preferences for personalized search
+                # Parse preferences and resume for job discovery
                 resume_data = json.loads(resume.parsed_data) if isinstance(resume.parsed_data, str) else resume.parsed_data
+                resume_text = resume.raw_text or json.dumps(resume_data)
+
                 prefs_dict = {
                     "preferred_roles": [r.strip() for r in preferences.preferred_roles.split(",") if r.strip()] if preferences.preferred_roles else [],
                     "preferred_locations": [l.strip() for l in preferences.preferred_locations.split(",") if l.strip()] if preferences.preferred_locations else [],
@@ -159,118 +175,54 @@ async def search_and_match_jobs(
                     "remote_preference": preferences.remote_preference,
                 }
 
-                logger.info(f"\n5. Calling Gemini Web Search with personalized prompt:")
-                logger.info(f"   Provider: Google Gemini")
-                logger.info(f"   Roles: {prefs_dict['preferred_roles']}")
-                logger.info(f"   Locations: {prefs_dict['preferred_locations']}")
-                logger.info(f"   Limit: {request.limit * 3}")
+                logger.info(f"\n5. Multi-source job discovery:")
 
-                searcher = GeminiWebJobSearcher(api_key)
-                web_jobs = await searcher.search_jobs(
-                    resume_data=resume_data,
+                # 1. Fetch from RemoteOK (always)
+                logger.info(f"   a) Fetching from RemoteOK...")
+                remoteok_jobs = await fetch_remoteok_jobs(limit=60)
+
+                # 2. Fetch from JSearch with smart AI-generated queries (always)
+                logger.info(f"   b) Fetching from JSearch with smart queries...")
+                jsearch_jobs = await fetch_jsearch_smart_queries(
+                    ai_provider=api_key_record.provider,
+                    api_key=api_key,
+                    resume_text=resume_text,
                     preferences=prefs_dict,
-                    limit=request.limit * 3,
+                    limit=60,
                 )
 
-                logger.info(f"   ✓ Gemini Web Search returned {len(web_jobs) if web_jobs else 0} jobs")
-
-                # Convert web jobs to internal format and cache
-                if web_jobs:
-                    formatted_jobs = []
-                    for web_job in web_jobs:
-                        formatted_job = {
-                            "jsearch_id": f"gemini_{uuid.uuid4()}",
-                            "title": web_job.get("title", ""),
-                            "company": web_job.get("company", ""),
-                            "location": web_job.get("location", ""),
-                            "is_remote": "remote" in (web_job.get("location", "") or "").lower() or web_job.get("is_remote", False),
-                            "salary_min": None,
-                            "salary_max": None,
-                            "description": web_job.get("description", ""),
-                            "requirements": web_job.get("requirements", []) if isinstance(web_job.get("requirements"), list) else [],
-                            "apply_url": web_job.get("apply_url", ""),
-                            "posted_at": web_job.get("posted_date"),
-                            "source": web_job.get("source", "gemini_web_search"),
-                        }
-                        formatted_jobs.append(formatted_job)
-
-                    await cache_jobs(db, formatted_jobs)
-                    jobs.extend(formatted_jobs)
-                    logger.info(f"   ✓ Web jobs cached. Total now: {len(jobs)}")
-                else:
-                    logger.warning(f"   ⚠ Gemini Web Search returned no jobs!")
-
-            except Exception as e:
-                logger.error(f"\n   ❌ Error fetching from Gemini Web Search: {str(e)}")
-                logger.error(f"      Exception type: {type(e).__name__}")
-                import traceback
-                logger.error(f"      Traceback: {traceback.format_exc()}")
-                logger.info(f"   → Falling back to JSearch...")
-
-                # Fallback to JSearch if Gemini search fails
-                try:
-                    jsearch = JSearchClient()
-                    roles = prefs_dict.get("preferred_roles", [])
-                    locations = prefs_dict.get("preferred_locations", [])
-                    query = roles[0] if roles else "software engineer"
-                    location = locations[0] if locations else None
-
-                    logger.info(f"\n   5b. Falling back to JSearch:")
-                    logger.info(f"       Query: {query}")
-                    logger.info(f"       Location: {location}")
-
-                    api_jobs = await jsearch.search_jobs(
-                        query=query,
-                        location=location,
-                        limit=request.limit * 3,
+                # 3. Fetch from Gemini web search (only if Gemini is selected)
+                gemini_jobs = []
+                if api_key_record.provider == "google":
+                    logger.info(f"   c) Fetching from Gemini web search...")
+                    gemini_jobs = await fetch_gemini_web_jobs(
+                        api_key=api_key,
+                        resume_text=resume_text,
+                        preferences=prefs_dict,
+                        limit=60,
                     )
 
-                    if api_jobs:
-                        await cache_jobs(db, api_jobs)
-                        jobs.extend(api_jobs)
-                        logger.info(f"       ✓ JSearch returned {len(api_jobs)} jobs")
-                    else:
-                        logger.warning(f"       ⚠ JSearch also returned no jobs!")
+                # Merge and dedupe all sources
+                logger.info(f"   d) Merging and deduplicating...")
+                merged_jobs = merge_and_dedupe_jobs(remoteok_jobs, jsearch_jobs, gemini_jobs)
 
-                except Exception as fallback_error:
-                    logger.error(f"   ❌ JSearch fallback also failed: {fallback_error}")
+                if merged_jobs:
+                    await cache_jobs(db, merged_jobs)
+                    jobs.extend(merged_jobs)
+                    logger.info(f"   ✓ Multi-source job discovery returned {len(merged_jobs)} unique jobs")
+                    logger.info(f"   Total jobs available: {len(jobs)}")
+                else:
+                    logger.warning(f"   ⚠ No jobs found from any source!")
                     if not jobs:
                         raise HTTPException(
-                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail=f"Failed to fetch jobs from both sources",
+                            status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No jobs found. Try adjusting your preferences.",
                         )
 
-        elif len(jobs) < request.limit * 2:
-            # For non-Google providers, use JSearch as fallback
-            try:
-                jsearch = JSearchClient()
-                roles = [r.strip() for r in preferences.preferred_roles.split(",") if r.strip()] if preferences.preferred_roles else []
-                locations = [l.strip() for l in preferences.preferred_locations.split(",") if l.strip()] if preferences.preferred_locations else []
-                query = roles[0] if roles else "software engineer"
-                location = locations[0] if locations else None
-
-                logger.info(f"\n5. Calling JSearch API with:")
-                logger.info(f"   Query: {query}")
-                logger.info(f"   Location: {location}")
-                logger.info(f"   Limit: {request.limit * 3}")
-
-                api_jobs = await jsearch.search_jobs(
-                    query=query,
-                    location=location,
-                    limit=request.limit * 3,
-                )
-
-                logger.info(f"   ✓ JSearch returned {len(api_jobs) if api_jobs else 0} jobs")
-
-                if api_jobs:
-                    await cache_jobs(db, api_jobs)
-                    jobs.extend(api_jobs)
-                    logger.info(f"   ✓ Jobs cached. Total now: {len(jobs)}")
-                else:
-                    logger.warning(f"   ⚠ JSearch returned no jobs!")
-
+            except HTTPException:
+                raise
             except Exception as e:
-                logger.error(f"\n   ❌ Error fetching from JSearch: {str(e)}")
+                logger.error(f"\n   ❌ Error in multi-source job discovery: {str(e)}")
                 logger.error(f"      Exception type: {type(e).__name__}")
                 import traceback
                 logger.error(f"      Traceback: {traceback.format_exc()}")
@@ -427,7 +379,7 @@ async def search_and_match_jobs(
 def get_job_matches(
     limit: int = 20,
     offset: int = 0,
-    min_score: int = 0,
+    min_score: int = 60,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):

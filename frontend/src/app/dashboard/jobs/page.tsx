@@ -22,9 +22,12 @@ interface Job {
 
 const SWIPE_THRESHOLD = 50
 
+const MIN_MATCH_SCORE = 60
+
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
   const [hasResume, setHasResume] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipedCards, setSwipedCards] = useState<Set<string>>(new Set())
@@ -59,7 +62,7 @@ export default function JobsPage() {
 
         if (resumeResponse.ok) {
           setHasResume(true)
-          const jobsResponse = await fetch(`${apiUrl}/api/jobs/matches?limit=50`, {
+          const jobsResponse = await fetch(`${apiUrl}/api/jobs/matches?limit=50&min_score=${MIN_MATCH_SCORE}`, {
             headers: { Authorization: `Bearer ${token}` },
           })
 
@@ -92,6 +95,61 @@ export default function JobsPage() {
 
     fetchJobs()
   }, [])
+
+  const handleFindJobs = async () => {
+    setIsSearching(true)
+    try {
+      const token = localStorage.getItem('access_token')
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+      // Call search endpoint with force_refresh
+      const searchResponse = await fetch(`${apiUrl}/api/jobs/search`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          limit: 50,
+          force_refresh: true,
+          required_skills: [],
+        }),
+      })
+
+      if (searchResponse.ok) {
+        // After search completes, fetch the matches
+        const matchesResponse = await fetch(`${apiUrl}/api/jobs/matches?limit=50&min_score=${MIN_MATCH_SCORE}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        if (matchesResponse.ok) {
+          const data = await matchesResponse.json()
+          const formattedJobs = (data.matches || []).map((match: any) => ({
+            id: match.job?.id || match.match_id,
+            jsearch_id: match.job?.jsearch_id || '',
+            title: match.job?.title || '',
+            company: match.job?.company || '',
+            location: match.job?.location || '',
+            salary_min: match.job?.salary_min,
+            salary_max: match.job?.salary_max,
+            is_remote: match.job?.is_remote || false,
+            description: match.job?.description || '',
+            match_score: match.match_score,
+            match_reasons: match.match_reasons || [],
+            posted_at: match.job?.posted_at,
+            apply_url: match.job?.apply_url || '',
+          }))
+          setJobs(formattedJobs)
+          setCurrentIndex(0)
+          setSwipedCards(new Set())
+        }
+      }
+    } catch (error) {
+      console.error('Failed to find jobs:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -227,10 +285,31 @@ export default function JobsPage() {
       >
         <div>
           <h1 className="text-3xl font-black">JOBS</h1>
-          <p className="text-sm text-gray-400">{remainingCount} remaining</p>
+          <p className="text-sm text-gray-400">{remainingCount} remaining ({jobs.length} total)</p>
         </div>
 
         <div className="flex items-center gap-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleFindJobs}
+            disabled={isSearching}
+            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-bold flex items-center gap-2 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSearching ? (
+              <>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full"
+                />
+                Searching...
+              </>
+            ) : (
+              <>🔍 Find Jobs</>
+            )}
+          </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
