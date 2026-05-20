@@ -74,3 +74,20 @@ class RefreshToken(Base):
         Index("idx_refresh_tokens_user_id", "user_id"),
         Index("idx_refresh_tokens_expires_at", "expires_at"),
     )
+
+
+class JobSearch(Base):
+    __tablename__ = "job_searches"
+
+    id = Column(ID_TYPE, primary_key=True, default=ID_DEFAULT)
+    user_id = Column(ID_TYPE, nullable=False, index=True)
+    status = Column(String(20), default="pending")  # pending, in_progress, completed, failed
+    filters = Column(Text)  # JSON string of search filters
+    total_jobs_searched = Column(Integer, default=0)
+    total_matches = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    completed_at = Column(DateTime)
+
+    __table_args__ = (
+        Index("idx_job_searches_user_id", "user_id"),
+    )

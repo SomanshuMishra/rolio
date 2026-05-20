@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 import logging
 import time
 import uuid
 import json
+import io
+import tempfile
 
 from ..database import get_db
 from ..models import User, Resume, UserPreferences, APIKey, UserJobMatch, UserJobAction, Job
@@ -20,6 +22,8 @@ from ..utils.security import decrypt_api_key
 from ..services.jsearch_client import JSearchClient, cache_jobs, get_non_expired_jobs, cleanup_expired_jobs
 from ..services.job_matcher import JobMatcher
 from ..services.web_job_searcher import GeminiWebJobSearcher
+from ..services.background_jobs import start_background_search
+from ..models import JobSearch
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 logger = logging.getLogger(__name__)
@@ -643,4 +647,321 @@ def apply_to_job(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to apply to job",
+        )
+
+
+@router.post("/search-async")
+def search_jobs_async(
+    request: JobSearchRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Start async job search. Returns search_id immediately."""
+    try:
+        # Create search record
+        search_id = str(uuid.uuid4())
+        search = JobSearch(
+            id=search_id,
+            user_id=current_user.id,
+            status="pending",
+            filters=json.dumps({
+                "limit": request.limit,
+                "required_skills": request.required_skills,
+                "force_refresh": request.force_refresh,
+            }),
+        )
+        db.add(search)
+        db.commit()
+
+        logger.info(f"Created async search {search_id} for user {current_user.id}")
+
+        # Start background task
+        start_background_search(
+            search_id,
+            str(current_user.id),
+            {
+                "limit": request.limit,
+                "required_skills": request.required_skills,
+                "force_refresh": request.force_refresh,
+            },
+        )
+
+        return {
+            "search_id": search_id,
+            "status": "pending",
+            "message": "Job search started. You will be notified when results are ready.",
+        }
+
+    except Exception as e:
+        logger.error(f"Error starting async search: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to start job search",
+        )
+
+
+@router.get("/search-status/{search_id}")
+def get_search_status(
+    search_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get status of async job search."""
+    try:
+        search = db.query(JobSearch).filter(
+            JobSearch.id == search_id,
+            JobSearch.user_id == current_user.id,
+        ).first()
+
+        if not search:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Search not found",
+            )
+
+        return {
+            "search_id": search_id,
+            "status": search.status,
+            "total_jobs_searched": search.total_jobs_searched,
+            "total_matches": search.total_matches,
+            "created_at": search.created_at,
+            "completed_at": search.completed_at,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting search status: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get search status",
+        )
+
+
+@router.get("/search-results/{search_id}")
+def get_search_results(
+    search_id: str,
+    limit: int = 50,
+    offset: int = 0,
+    min_score: int = 60,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get results from async job search."""
+    try:
+        search = db.query(JobSearch).filter(
+            JobSearch.id == search_id,
+            JobSearch.user_id == current_user.id,
+        ).first()
+
+        if not search:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Search not found",
+            )
+
+        if search.status != "completed":
+            return {
+                "status": search.status,
+                "matches": [],
+                "total": 0,
+            }
+
+        # Get matches
+        query = db.query(UserJobMatch).filter(
+            UserJobMatch.user_id == current_user.id,
+            UserJobMatch.match_score >= min_score,
+        )
+
+        total = query.count()
+
+        matches = (
+            query.order_by(UserJobMatch.match_score.desc())
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+
+        result_matches = []
+        for match in matches:
+            job = db.query(Job).filter(Job.id == match.job_id).first()
+            if not job:
+                continue
+
+            action = db.query(UserJobAction).filter(
+                UserJobAction.user_id == current_user.id,
+                UserJobAction.job_id == match.job_id,
+            ).first()
+
+            match_reasons_data = match.match_reasons
+            if isinstance(match_reasons_data, str):
+                match_reasons_data = json.loads(match_reasons_data) if match_reasons_data else {}
+            match_reasons_list = match_reasons_data.get("reasons", []) if match_reasons_data else []
+
+            result_matches.append({
+                "match_id": str(match.id),
+                "job": {
+                    "id": str(job.id),
+                    "jsearch_id": job.jsearch_id,
+                    "title": job.title,
+                    "company": job.company,
+                    "location": job.location,
+                    "is_remote": job.is_remote,
+                    "salary_min": job.salary_min,
+                    "salary_max": job.salary_max,
+                    "description": job.description,
+                    "apply_url": job.apply_url,
+                    "posted_at": job.posted_at,
+                },
+                "match_score": match.match_score,
+                "match_reasons": match_reasons_list,
+                "user_action": action.action if action else None,
+            })
+
+        return {
+            "status": search.status,
+            "total": total,
+            "limit": limit,
+            "offset": offset,
+            "matches": result_matches,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting search results: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get search results",
+        )
+
+
+@router.get("/search-results/{search_id}/export")
+def export_search_results(
+    search_id: str,
+    min_score: int = 60,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Export search results as Excel file."""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+
+        search = db.query(JobSearch).filter(
+            JobSearch.id == search_id,
+            JobSearch.user_id == current_user.id,
+        ).first()
+
+        if not search:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Search not found",
+            )
+
+        # Get all matches
+        matches = db.query(UserJobMatch).filter(
+            UserJobMatch.user_id == current_user.id,
+            UserJobMatch.match_score >= min_score,
+        ).order_by(UserJobMatch.match_score.desc()).all()
+
+        # Create workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Job Matches"
+
+        # Add headers
+        headers = [
+            "Rank",
+            "Job Title",
+            "Company",
+            "Location",
+            "Remote",
+            "Match %",
+            "Salary Min",
+            "Salary Max",
+            "Why Matched",
+            "Status",
+            "Apply URL",
+        ]
+
+        ws.append(headers)
+
+        # Style header row
+        header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF")
+
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        # Add data
+        for rank, match in enumerate(matches, 1):
+            job = db.query(Job).filter(Job.id == match.job_id).first()
+            if not job:
+                continue
+
+            action = db.query(UserJobAction).filter(
+                UserJobAction.user_id == current_user.id,
+                UserJobAction.job_id == match.job_id,
+            ).first()
+
+            match_reasons_data = match.match_reasons
+            if isinstance(match_reasons_data, str):
+                match_reasons_data = json.loads(match_reasons_data) if match_reasons_data else {}
+            match_reasons = match_reasons_data.get("reasons", []) if match_reasons_data else []
+
+            ws.append([
+                rank,
+                job.title,
+                job.company,
+                job.location,
+                "Yes" if job.is_remote else "No",
+                f"{match.match_score}%",
+                job.salary_min or "",
+                job.salary_max or "",
+                "; ".join(match_reasons[:3]) if match_reasons else "Good match",
+                action.action.title() if action else "Not applied",
+                job.apply_url,
+            ])
+
+        # Adjust column widths
+        ws.column_dimensions["A"].width = 5
+        ws.column_dimensions["B"].width = 30
+        ws.column_dimensions["C"].width = 20
+        ws.column_dimensions["D"].width = 20
+        ws.column_dimensions["E"].width = 8
+        ws.column_dimensions["F"].width = 10
+        ws.column_dimensions["G"].width = 12
+        ws.column_dimensions["H"].width = 12
+        ws.column_dimensions["I"].width = 40
+        ws.column_dimensions["J"].width = 12
+        ws.column_dimensions["K"].width = 40
+
+        # Save to temporary file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+        wb.save(temp_file.name)
+        temp_file.close()
+
+        logger.info(f"Exported {len(matches)} matches for user {current_user.id}")
+
+        return FileResponse(
+            path=temp_file.name,
+            filename=f"rolio_job_matches_{search_id[:8]}.xlsx",
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
+    except ImportError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Excel export requires openpyxl library",
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error exporting results: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to export results",
         )
