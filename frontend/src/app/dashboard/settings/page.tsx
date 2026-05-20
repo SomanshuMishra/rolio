@@ -2,11 +2,13 @@
 
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/Toast'
 import api from '@/lib/api'
 import Modal from '@/components/Modal'
 
 export default function SettingsPage() {
+  const router = useRouter()
   const { addToast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [showApiGuide, setShowApiGuide] = useState(false)
@@ -60,6 +62,7 @@ export default function SettingsPage() {
     setIsSaving(true)
 
     try {
+      // Save preferences
       await api.put('/api/settings/preferences', {
         preferred_roles: preferences.preferred_roles.length > 0 ? preferences.preferred_roles : undefined,
         preferred_locations: preferences.preferred_locations.length > 0 ? preferences.preferred_locations : undefined,
@@ -68,7 +71,24 @@ export default function SettingsPage() {
         remote_preference: preferences.remote_preference,
       })
 
-      addToast('Preferences saved successfully!', 'success')
+      addToast('Preferences saved! Starting job search...', 'success')
+
+      // Trigger async job search
+      try {
+        const searchResponse = await api.post('/api/jobs/search-async', {
+          limit: 50,
+          force_refresh: true,
+          required_skills: [],
+        })
+
+        const searchId = searchResponse.data.search_id
+
+        // Redirect to jobs page with search_id
+        router.push(`/dashboard/jobs?search_id=${searchId}`)
+      } catch (searchError: any) {
+        console.error('Failed to start search:', searchError)
+        addToast('Preferences saved, but failed to start job search', 'error')
+      }
     } catch (error: any) {
       addToast('Failed to save preferences', 'error')
       console.error('Error:', error)
