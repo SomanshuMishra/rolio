@@ -44,9 +44,9 @@ const modalVariants = {
 }
 
 const buttonStyles = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-  secondary: 'bg-gray-700 hover:bg-gray-600 text-white',
-  danger: 'bg-red-600 hover:bg-red-700 text-white',
+  primary: 'bg-blue-600 hover:bg-blue-700 text-[#0f172a]',
+  secondary: 'bg-gray-700 hover:bg-gray-600 text-[#0f172a]',
+  danger: 'bg-red-600 hover:bg-red-700 text-[#0f172a]',
 }
 
 export default function Modal({ isOpen, onClose, title, children, actions }: ModalProps) {
@@ -59,7 +59,7 @@ export default function Modal({ isOpen, onClose, title, children, actions }: Mod
           animate="visible"
           exit="hidden"
           onClick={onClose}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-[#f8f7ff]/50 backdrop-blur-sm flex items-center justify-center z-50"
         >
           <motion.div
             variants={modalVariants}
@@ -67,11 +67,11 @@ export default function Modal({ isOpen, onClose, title, children, actions }: Mod
             animate="visible"
             exit="exit"
             onClick={(e) => e.stopPropagation()}
-            className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-2xl max-w-md w-full mx-4 overflow-hidden"
+            className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-2xl max-w-md w-full mx-4 overflow-hidden"
           >
             {/* Header */}
             {title && (
-              <div className="px-6 py-4 border-b border-white/10">
+              <div className="px-6 py-4 border-b border-gray-100">
                 <h2 className="text-xl font-bold">{title}</h2>
               </div>
             )}
@@ -81,7 +81,7 @@ export default function Modal({ isOpen, onClose, title, children, actions }: Mod
 
             {/* Actions */}
             {actions && actions.length > 0 && (
-              <div className="px-6 py-4 border-t border-white/10 flex gap-3">
+              <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
                 {actions.map((action, idx) => (
                   <motion.button
                     key={idx}

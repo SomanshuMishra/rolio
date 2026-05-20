@@ -38,7 +38,7 @@ export default function AnimatedInput({
       <div className="relative">
         {/* Icon */}
         {icon && (
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500">
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 group-focus-within:text-indigo-600">
             {icon}
           </div>
         )}
@@ -54,17 +54,17 @@ export default function AnimatedInput({
           placeholder={placeholder}
           className={`w-full px-4 py-3 ${
             icon ? 'pl-12' : ''
-          } bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-300 ${
+          } bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none transition-all duration-300 ${
             error
-              ? 'border-red-500/50 focus:border-red-500'
+              ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
               : isFocused
-                ? 'border-blue-500/50 bg-white/10'
-                : 'hover:border-white/20'
+                ? 'border-indigo-400 bg-white ring-4 ring-indigo-50'
+                : 'hover:border-gray-300'
           }`}
           animate={{
             boxShadow: isFocused
-              ? '0 0 20px rgba(59, 130, 246, 0.2)'
-              : '0 0 0px rgba(59, 130, 246, 0)',
+              ? '0 0 20px rgba(99, 102, 241, 0.1)'
+              : '0 0 0px rgba(99, 102, 241, 0)',
           }}
           transition={{ duration: 0.3 }}
         />
@@ -72,11 +72,11 @@ export default function AnimatedInput({
         {/* Floating label */}
         <motion.label
           htmlFor={name}
-          className="absolute left-4 text-gray-400 pointer-events-none origin-left"
+          className="absolute left-4 pointer-events-none origin-left"
           animate={{
             y: value || isFocused ? -24 : 12,
             scale: value || isFocused ? 0.85 : 1,
-            color: error ? 'rgb(239, 68, 68)' : isFocused ? 'rgb(59, 130, 246)' : 'rgb(156, 163, 175)',
+            color: error ? 'rgb(239, 68, 68)' : isFocused ? 'rgb(99, 102, 241)' : 'rgb(107, 114, 128)',
           }}
           transition={{ duration: 0.2 }}
         >
@@ -86,7 +86,7 @@ export default function AnimatedInput({
 
         {/* Error message */}
         <motion.p
-          className="text-red-400 text-sm mt-2 h-5"
+          className="text-red-500 text-sm mt-2 h-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: error ? 1 : 0 }}
           transition={{ duration: 0.2 }}

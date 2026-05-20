@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <main className="relative w-full min-h-screen bg-black overflow-hidden">
+    <main className="relative w-full min-h-screen bg-[#f8f7ff] overflow-hidden">
       <ParticleBackground
         particleCount={150}
         textString="Rolio"

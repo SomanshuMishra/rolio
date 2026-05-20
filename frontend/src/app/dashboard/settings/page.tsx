@@ -177,12 +177,12 @@ export default function SettingsPage() {
         transition={{ duration: 0.4 }}
       >
         <h1 className="text-4xl font-bold mb-2">Settings</h1>
-        <p className="text-gray-400 mb-8">Configure your preferences and API keys for job matching</p>
+        <p className="text-gray-600 mb-8">Configure your preferences and API keys for job matching</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Job Preferences */}
           <motion.div
-            className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-8"
+            className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -200,7 +200,7 @@ export default function SettingsPage() {
                       preferred_roles: e.target.value.split(',').map((r) => r.trim()),
                     })
                   }
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none"
                   placeholder="e.g., Software Engineer, Python Developer"
                 />
               </div>
@@ -216,7 +216,7 @@ export default function SettingsPage() {
                       preferred_locations: e.target.value.split(',').map((l) => l.trim()),
                     })
                   }
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none"
                   placeholder="e.g., San Francisco, New York, Remote"
                 />
               </div>
@@ -228,7 +228,7 @@ export default function SettingsPage() {
                     type="number"
                     value={preferences.salary_min}
                     onChange={(e) => setPreferences({ ...preferences, salary_min: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none"
                     placeholder="80000"
                   />
                 </div>
@@ -238,7 +238,7 @@ export default function SettingsPage() {
                     type="number"
                     value={preferences.salary_max}
                     onChange={(e) => setPreferences({ ...preferences, salary_max: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none"
                     placeholder="150000"
                   />
                 </div>
@@ -249,7 +249,7 @@ export default function SettingsPage() {
                 <select
                   value={preferences.remote_preference}
                   onChange={(e) => setPreferences({ ...preferences, remote_preference: e.target.value })}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none"
                 >
                   <option value="any">Any</option>
                   <option value="remote">Remote Only</option>
@@ -272,7 +272,7 @@ export default function SettingsPage() {
 
           {/* AI Configuration */}
           <motion.div
-            className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-8"
+            className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -281,7 +281,7 @@ export default function SettingsPage() {
               <h2 className="text-xl font-semibold">AI Provider</h2>
               <motion.button
                 onClick={() => setShowApiGuide(true)}
-                className="text-xs px-3 py-1 bg-white/10 hover:bg-white/20 rounded text-blue-400"
+                className="text-xs px-3 py-1 bg-white/50 hover:bg-white/20 rounded text-blue-400"
                 whileHover={{ scale: 1.05 }}
               >
                 📖 Setup Guide
@@ -293,13 +293,13 @@ export default function SettingsPage() {
               <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
                 <p className="text-sm text-green-400 mb-3">✓ Active API Keys:</p>
                 {existingKeys.map((key) => (
-                  <div key={key.provider} className="flex items-center justify-between text-sm mb-3 last:mb-0 p-3 bg-white/5 rounded">
+                  <div key={key.provider} className="flex items-center justify-between text-sm mb-3 last:mb-0 p-3 bg-white rounded">
                     <div className="flex-1">
                       <div className="capitalize font-medium">
                         {key.provider} {key.key_preview}
                       </div>
                       {key.model_preference && (
-                        <div className="text-xs text-gray-400 mt-1">Model: {key.model_preference}</div>
+                        <div className="text-xs text-gray-600 mt-1">Model: {key.model_preference}</div>
                       )}
                     </div>
                     <div className="flex gap-2">
@@ -336,7 +336,7 @@ export default function SettingsPage() {
                 <select
                   value={apiProvider}
                   onChange={(e) => setApiProvider(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none"
                 >
                   <option value="google">Google Gemini ⭐ Free & Recommended</option>
                   <option value="groq">Groq ⚡ Free & Super Fast</option>
@@ -352,10 +352,10 @@ export default function SettingsPage() {
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none font-mono"
+                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none font-mono"
                   placeholder="sk-••••••••••••••••"
                 />
-                <p className="text-xs text-gray-400 mt-2">🔒 Encrypted with AES-256, never shared</p>
+                <p className="text-xs text-gray-600 mt-2">🔒 Encrypted with AES-256, never shared</p>
               </div>
 
               <div>
@@ -364,10 +364,10 @@ export default function SettingsPage() {
                   type="text"
                   value={modelPreference}
                   onChange={(e) => setModelPreference(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] text-sm focus:border-blue-500 outline-none"
                   placeholder="e.g., gpt-4, claude-3-sonnet"
                 />
-                <p className="text-xs text-gray-400 mt-2">Specify which model to use for this provider (optional)</p>
+                <p className="text-xs text-gray-600 mt-2">Specify which model to use for this provider (optional)</p>
               </div>
 
               <motion.button
@@ -389,7 +389,7 @@ export default function SettingsPage() {
         <div className="space-y-4 text-sm max-h-[600px] overflow-y-auto">
           <div>
             <h3 className="font-semibold text-green-400 mb-2">⭐ Google Gemini (Completely Free - Recommended)</h3>
-            <p className="text-xs text-gray-400 mb-2">60 requests/minute • Web search grounding • No credit card needed</p>
+            <p className="text-xs text-gray-600 mb-2">60 requests/minute • Web search grounding • No credit card needed</p>
             <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
               <li>Visit <span className="font-mono text-blue-300">aistudio.google.com/app/apikey</span></li>
               <li>Click "Get API Key" button</li>
@@ -398,9 +398,9 @@ export default function SettingsPage() {
             </ol>
           </div>
 
-          <div className="border-t border-white/10 pt-3">
+          <div className="border-t border-gray-100 pt-3">
             <h3 className="font-semibold text-yellow-400 mb-2">⚡ Groq (Free & Lightning Fast)</h3>
-            <p className="text-xs text-gray-400 mb-2">30 requests/minute • Extremely fast inference • No credit card needed</p>
+            <p className="text-xs text-gray-600 mb-2">30 requests/minute • Extremely fast inference • No credit card needed</p>
             <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
               <li>Visit <span className="font-mono text-blue-300">console.groq.com</span></li>
               <li>Sign up with email (free)</li>
@@ -409,9 +409,9 @@ export default function SettingsPage() {
             </ol>
           </div>
 
-          <div className="border-t border-white/10 pt-3">
+          <div className="border-t border-gray-100 pt-3">
             <h3 className="font-semibold text-blue-400 mb-2">💬 OpenAI (GPT-4, Paid)</h3>
-            <p className="text-xs text-gray-400 mb-2">Pay-as-you-go • Highly capable • API keys at platform.openai.com</p>
+            <p className="text-xs text-gray-600 mb-2">Pay-as-you-go • Highly capable • API keys at platform.openai.com</p>
             <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
               <li>Visit <span className="font-mono text-blue-300">platform.openai.com/api-keys</span></li>
               <li>Create new secret key</li>
@@ -420,9 +420,9 @@ export default function SettingsPage() {
             </ol>
           </div>
 
-          <div className="border-t border-white/10 pt-3">
+          <div className="border-t border-gray-100 pt-3">
             <h3 className="font-semibold text-purple-400 mb-2">🧠 Claude/Anthropic (Paid)</h3>
-            <p className="text-xs text-gray-400 mb-2">State-of-the-art • Great for analysis • API keys at console.anthropic.com</p>
+            <p className="text-xs text-gray-600 mb-2">State-of-the-art • Great for analysis • API keys at console.anthropic.com</p>
             <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
               <li>Visit <span className="font-mono text-blue-300">console.anthropic.com/keys</span></li>
               <li>Create new API key</li>
@@ -431,9 +431,9 @@ export default function SettingsPage() {
             </ol>
           </div>
 
-          <div className="border-t border-white/10 pt-3">
+          <div className="border-t border-gray-100 pt-3">
             <h3 className="font-semibold text-red-400 mb-2">🚀 Grok/X.AI (Paid)</h3>
-            <p className="text-xs text-gray-400 mb-2">Real-time data • Powerful reasoning • API keys at console.x.ai</p>
+            <p className="text-xs text-gray-600 mb-2">Real-time data • Powerful reasoning • API keys at console.x.ai</p>
             <ol className="list-decimal list-inside space-y-1 text-gray-300 text-xs">
               <li>Visit <span className="font-mono text-blue-300">console.x.ai</span></li>
               <li>Create new API key</li>
@@ -442,7 +442,7 @@ export default function SettingsPage() {
             </ol>
           </div>
 
-          <p className="text-xs text-gray-400 pt-3 border-t border-white/10">
+          <p className="text-xs text-gray-600 pt-3 border-t border-gray-100">
             💡 Start with free options (Gemini or Groq). Only one default provider is used for job matching.
           </p>
         </div>

@@ -24,7 +24,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
 
   return (
     <motion.header
-      className={`sticky top-0 z-40 bg-gradient-to-r from-gray-900/95 to-black/95 backdrop-blur-sm border-b border-white/10 transition-all duration-300 ${
+      className={`sticky top-0 z-40 bg-gradient-to-r from-white/95 to-white/95 backdrop-blur-sm border-b border-gray-100 transition-all duration-300 ${
         isCollapsed ? 'ml-[68px]' : 'ml-[260px]'
       }`}
       initial={{ opacity: 0, y: -20 }}
@@ -43,9 +43,9 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
             <input
               type="text"
               placeholder="Search jobs, preferences..."
-              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
+              className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-sm text-[#0f172a] placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
             />
-            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-700">🔍</span>
           </div>
         </motion.div>
 
@@ -58,7 +58,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
         >
           {/* Notifications */}
           <motion.button
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors relative"
+            className="p-2 hover:bg-white/50 rounded-lg transition-colors relative"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -70,25 +70,25 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
           <div className="relative">
             <motion.button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="flex items-center gap-3 px-3 py-2 hover:bg-white/50 rounded-lg transition-colors"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full flex items-center justify-center text-[#0f172a] font-semibold text-sm">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-sm font-medium text-white">{userName}</p>
-                <p className="text-xs text-gray-400">{userEmail}</p>
+                <p className="text-sm font-medium text-[#0f172a]">{userName}</p>
+                <p className="text-xs text-gray-600">{userEmail}</p>
               </div>
-              <span className="text-gray-400">▼</span>
+              <span className="text-gray-600">▼</span>
             </motion.button>
 
             {/* Dropdown menu */}
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
-                  className="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-lg overflow-hidden z-50"
+                  className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden z-50"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -96,7 +96,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
                 >
                   <Link href="/dashboard/profile">
                     <motion.div
-                      className="px-4 py-2 hover:bg-white/10 text-sm text-white cursor-pointer transition-colors flex items-center gap-2"
+                      className="px-4 py-2 hover:bg-white/50 text-sm text-[#0f172a] cursor-pointer transition-colors flex items-center gap-2"
                       whileHover={{ x: 4 }}
                     >
                       👤 Profile
@@ -104,13 +104,13 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
                   </Link>
                   <Link href="/dashboard/settings">
                     <motion.div
-                      className="px-4 py-2 hover:bg-white/10 text-sm text-white cursor-pointer transition-colors flex items-center gap-2"
+                      className="px-4 py-2 hover:bg-white/50 text-sm text-[#0f172a] cursor-pointer transition-colors flex items-center gap-2"
                       whileHover={{ x: 4 }}
                     >
                       ⚙️ Settings
                     </motion.div>
                   </Link>
-                  <div className="border-t border-white/10" />
+                  <div className="border-t border-gray-100" />
                   <motion.button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 hover:bg-red-500/20 text-sm text-red-400 cursor-pointer transition-colors flex items-center gap-2"

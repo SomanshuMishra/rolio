@@ -111,7 +111,7 @@ export default function JobCard({ job, index }: JobCardProps) {
           <div>
             <div className="flex items-start justify-between mb-5">
               <div className="flex-1">
-                <h3 className="text-lg font-bold mb-2 text-white line-clamp-2 leading-tight">
+                <h3 className="text-lg font-bold mb-2 text-[#0f172a] line-clamp-2 leading-tight">
                   {job.title}
                 </h3>
                 <p className="text-sm text-purple-300 font-medium mb-2">{job.company}</p>
@@ -138,12 +138,12 @@ export default function JobCard({ job, index }: JobCardProps) {
           <div className="space-y-3 border-t border-purple-500/20 pt-4 mt-2">
             <div>
               <p className="text-xs text-purple-300 mb-1 font-medium">Salary Range</p>
-              <p className="text-sm font-semibold text-white">{salaryRange}</p>
+              <p className="text-sm font-semibold text-[#0f172a]">{salaryRange}</p>
             </div>
 
             <div className="flex gap-2">
               <motion.button
-                className="flex-1 py-2 px-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-lg text-xs font-medium transition-all text-white shadow-lg"
+                className="flex-1 py-2 px-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-lg text-xs font-medium transition-all text-[#0f172a] shadow-lg"
                 whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(168, 85, 247, 0.4)' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={(e) => {
@@ -158,7 +158,7 @@ export default function JobCard({ job, index }: JobCardProps) {
               <motion.button
                 className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${
                   isSaved
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-[#0f172a] shadow-lg'
                     : 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30'
                 }`}
                 whileHover={{ scale: 1.05 }}
@@ -232,7 +232,7 @@ export default function JobCard({ job, index }: JobCardProps) {
           </div>
 
           <motion.button
-            className="w-full mt-4 py-2 px-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-lg text-xs font-medium transition-all text-white shadow-lg"
+            className="w-full mt-4 py-2 px-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-lg text-xs font-medium transition-all text-[#0f172a] shadow-lg"
             whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(168, 85, 247, 0.4)' }}
             whileTap={{ scale: 0.95 }}
             onClick={(e) => {

@@ -75,7 +75,7 @@ export default function SavedJobsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white pt-20 px-6">
+      <div className="min-h-screen bg-[#f8f7ff] text-[#0f172a] pt-20 px-6">
         <motion.div
           className="flex justify-center items-center py-20"
           initial={{ opacity: 0 }}
@@ -84,7 +84,7 @@ export default function SavedJobsPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-12 h-12 border-3 border-white/20 border-t-blue-500 rounded-full"
+            className="w-12 h-12 border-3 border-gray-200 border-t-blue-500 rounded-full"
           />
         </motion.div>
       </div>
@@ -92,12 +92,12 @@ export default function SavedJobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-20 px-6">
+    <div className="min-h-screen bg-[#f8f7ff] text-[#0f172a] pt-20 px-6">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-5xl font-black mb-2">❤️ SAVED JOBS</h1>
-          <p className="text-gray-400">{sortedJobs.length} job{sortedJobs.length !== 1 ? 's' : ''} saved</p>
+          <p className="text-gray-600">{sortedJobs.length} job{sortedJobs.length !== 1 ? 's' : ''} saved</p>
         </div>
 
         {/* Sort Options */}
@@ -106,7 +106,7 @@ export default function SavedJobsPage() {
             <motion.button
               onClick={() => setSortBy('date')}
               className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
-                sortBy === 'date' ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                sortBy === 'date' ? 'bg-blue-600 text-[#0f172a]' : 'bg-white/50 text-gray-600 hover:bg-white/20'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -116,7 +116,7 @@ export default function SavedJobsPage() {
             <motion.button
               onClick={() => setSortBy('score')}
               className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
-                sortBy === 'score' ? 'bg-blue-600 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                sortBy === 'score' ? 'bg-blue-600 text-[#0f172a]' : 'bg-white/50 text-gray-600 hover:bg-white/20'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -146,7 +146,7 @@ export default function SavedJobsPage() {
           >
             <div className="text-6xl mb-4">📭</div>
             <h2 className="text-2xl font-bold mb-2">No Saved Jobs Yet</h2>
-            <p className="text-gray-400 mb-6">Save jobs from the Jobs page to review them later</p>
+            <p className="text-gray-600 mb-6">Save jobs from the Jobs page to review them later</p>
             <motion.a
               href="/dashboard/jobs"
               className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-colors"
@@ -166,7 +166,7 @@ export default function SavedJobsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -300 }}
                   transition={{ delay: index * 0.05 }}
-                  className="group bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-white/10 rounded-2xl p-6 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-blue-500/10"
+                  className="group bg-gradient-to-r from-white/50 to-gray-800/50 border border-gray-100 rounded-2xl p-6 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-blue-500/10"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -182,14 +182,14 @@ export default function SavedJobsPage() {
                             {Math.round(savedJob.match_score)}% Match
                           </span>
                         </motion.div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-700">
                           {new Date(savedJob.created_at).toLocaleDateString()}
                         </span>
                       </div>
 
                       <h3 className="text-2xl font-bold mb-2">{savedJob.job.title}</h3>
                       <p className="text-lg text-gray-300 mb-2">{savedJob.job.company}</p>
-                      <div className="flex items-center gap-3 text-sm text-gray-400 flex-wrap">
+                      <div className="flex items-center gap-3 text-sm text-gray-600 flex-wrap">
                         <span>📍 {savedJob.job.location}</span>
                         {savedJob.job.is_remote && (
                           <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-xs font-bold">
@@ -233,9 +233,9 @@ export default function SavedJobsPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       transition={{ delay: 0.15 }}
-                      className="mt-4 pt-4 border-t border-white/10"
+                      className="mt-4 pt-4 border-t border-gray-100"
                     >
-                      <p className="text-xs font-bold uppercase text-gray-400 mb-3">Why you'd be great</p>
+                      <p className="text-xs font-bold uppercase text-gray-600 mb-3">Why you'd be great</p>
                       <ul className="space-y-2">
                         {savedJob.match_reasons.slice(0, 3).map((reason, i) => (
                           <motion.li

@@ -98,7 +98,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-violet-500/10 rounded-2xl blur-xl" />
 
-        <div className="relative backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8">
+        <div className="relative backdrop-blur-md bg-white border border-gray-100 rounded-2xl p-8">
           {/* Header */}
           <div className="mb-8">
             <motion.h1
@@ -110,7 +110,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               Create Account
             </motion.h1>
             <motion.p
-              className="text-gray-400 text-sm"
+              className="text-gray-600 text-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
@@ -182,7 +182,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <motion.button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+            className="w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-[#0f172a] font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
             whileHover={{ scale: isLoading ? 1 : 1.02 }}
             whileTap={{ scale: isLoading ? 1 : 0.98 }}
             initial={{ opacity: 0, y: 10 }}
@@ -219,7 +219,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {/* Login link */}
           <motion.p
-            className="text-center mt-6 text-gray-400 text-sm"
+            className="text-center mt-6 text-gray-600 text-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.4 }}

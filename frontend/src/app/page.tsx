@@ -39,7 +39,7 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <main className="relative w-full min-h-screen bg-black overflow-hidden">
+    <main className="relative w-full min-h-screen bg-[#f8f7ff] overflow-hidden">
       {/* Particle background */}
       <ParticleBackground
         particleCount={200}
@@ -68,7 +68,7 @@ export default function LandingPage() {
 
           {/* Subheading */}
           <motion.p
-            className="text-xl md:text-2xl text-gray-400 mb-8 max-w-2xl mx-auto font-display"
+            className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto font-display"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.8 }}
@@ -78,7 +78,7 @@ export default function LandingPage() {
 
           {/* Description */}
           <motion.p
-            className="text-gray-500 mb-12 max-w-xl mx-auto text-lg"
+            className="text-gray-700 mb-12 max-w-xl mx-auto text-lg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 0.8 }}
@@ -96,7 +96,7 @@ export default function LandingPage() {
             <Link href="/auth/register">
               <motion.button
                 ref={ctaRef}
-                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-full glow smooth-transition hover:shadow-2xl relative overflow-hidden group"
+                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-[#0f172a] rounded-full glow smooth-transition hover:shadow-2xl relative overflow-hidden group"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
@@ -146,7 +146,7 @@ export default function LandingPage() {
               >
                 <div className="text-4xl mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-display font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-400 text-sm">{feature.description}</p>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
               </motion.div>
             ))}
           </motion.div>

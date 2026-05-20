@@ -60,7 +60,7 @@ export default function JobFilters({ onFiltersChange }: JobFiltersProps) {
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">🔍</span>
-          <h3 className="text-lg font-bold text-white">Smart Filters</h3>
+          <h3 className="text-lg font-bold text-[#0f172a]">Smart Filters</h3>
         </div>
         <motion.span
           className="text-xl text-purple-400"
@@ -89,7 +89,7 @@ export default function JobFilters({ onFiltersChange }: JobFiltersProps) {
                 value={filters.searchTerm}
                 onChange={(e) => handleFilterChange({ searchTerm: e.target.value })}
                 placeholder="Software Engineer, Product Manager..."
-                className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-lg text-white text-sm placeholder-purple-400/50 focus:border-purple-400 focus:bg-purple-500/20 outline-none transition-all duration-200"
+                className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-lg text-[#0f172a] text-sm placeholder-purple-400/50 focus:border-purple-400 focus:bg-purple-500/20 outline-none transition-all duration-200"
               />
             </motion.div>
 
@@ -144,7 +144,7 @@ export default function JobFilters({ onFiltersChange }: JobFiltersProps) {
               <div className="relative">
                 <motion.button
                   onClick={() => setShowSkillDropdown(!showSkillDropdown)}
-                  className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-lg text-white text-sm text-left flex items-center justify-between hover:bg-purple-500/20 transition-all"
+                  className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-lg text-[#0f172a] text-sm text-left flex items-center justify-between hover:bg-purple-500/20 transition-all"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
@@ -253,7 +253,7 @@ export default function JobFilters({ onFiltersChange }: JobFiltersProps) {
                 onFiltersChange(defaultFilters)
                 setShowSkillDropdown(false)
               }}
-              className="w-full py-3 px-4 bg-gradient-to-r from-purple-600/50 to-blue-600/50 hover:from-purple-600 hover:to-blue-600 rounded-lg text-sm font-semibold text-white transition-all duration-200 border border-purple-500/30 hover:border-purple-500/50"
+              className="w-full py-3 px-4 bg-gradient-to-r from-purple-600/50 to-blue-600/50 hover:from-purple-600 hover:to-blue-600 rounded-lg text-sm font-semibold text-[#0f172a] transition-all duration-200 border border-purple-500/30 hover:border-purple-500/50"
               whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(168, 85, 247, 0.2)' }}
               whileTap={{ scale: 0.98 }}
             >

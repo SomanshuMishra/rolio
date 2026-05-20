@@ -114,7 +114,7 @@ export default function Sidebar() {
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-display font-bold">R</span>
+            <span className="text-[#0f172a] font-display font-bold">R</span>
           </div>
           <AnimatePresence mode="wait">
             {!isCollapsed && (
@@ -137,9 +137,9 @@ export default function Sidebar() {
           whileTap={{ scale: 0.95 }}
         >
           {isCollapsed ? (
-            <ChevronRight size={18} className="text-white/60" />
+            <ChevronRight size={18} className="text-[#0f172a]/60" />
           ) : (
-            <ChevronLeft size={18} className="text-white/60" />
+            <ChevronLeft size={18} className="text-[#0f172a]/60" />
           )}
         </motion.button>
       </motion.div>
@@ -156,7 +156,7 @@ export default function Sidebar() {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/20 mb-3 px-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#0f172a]/20 mb-3 px-3">
                     {section.label}
                   </p>
                 </motion.div>
@@ -198,7 +198,7 @@ export default function Sidebar() {
                           <Icon
                             size={20}
                             className={`transition-colors duration-200 ${
-                              isActive ? 'text-indigo-400' : 'text-white/50 group-hover:text-white/70'
+                              isActive ? 'text-indigo-400' : 'text-[#0f172a]/50 group-hover:text-[#0f172a]/70'
                             }`}
                           />
                         </div>
@@ -215,7 +215,7 @@ export default function Sidebar() {
                             >
                               <span
                                 className={`text-sm font-medium truncate transition-colors duration-200 ${
-                                  isActive ? 'text-white' : 'text-white/70'
+                                  isActive ? 'text-[#0f172a]' : 'text-[#0f172a]/70'
                                 }`}
                               >
                                 {item.name}
@@ -260,7 +260,7 @@ export default function Sidebar() {
       <motion.div className="border-t border-white/[0.06] p-3 space-y-2">
         <motion.div className="px-3 py-2.5 rounded-lg bg-white/[0.03] flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-bold text-white">{userName.charAt(0).toUpperCase()}</span>
+            <span className="text-xs font-bold text-[#0f172a]">{userName.charAt(0).toUpperCase()}</span>
           </div>
           <AnimatePresence mode="wait">
             {!isCollapsed && (
@@ -271,8 +271,8 @@ export default function Sidebar() {
                 exit={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <p className="text-xs font-medium text-white truncate">{userName}</p>
-                <p className="text-[10px] text-white/40">Tech Professional</p>
+                <p className="text-xs font-medium text-[#0f172a] truncate">{userName}</p>
+                <p className="text-[10px] text-[#0f172a]/40">Tech Professional</p>
               </motion.div>
             )}
           </AnimatePresence>

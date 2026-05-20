@@ -244,11 +244,11 @@ export default function JobsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#f8f7ff] flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="w-12 h-12 border-3 border-white/20 border-t-white rounded-full"
+          className="w-12 h-12 border-3 border-gray-200 border-t-white rounded-full"
         />
       </div>
     )
@@ -256,13 +256,13 @@ export default function JobsPage() {
 
   if (!hasResume) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#f8f7ff] flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <p className="text-white text-2xl mb-4">📄 Upload resume first</p>
+          <p className="text-[#0f172a] text-2xl mb-4">📄 Upload resume first</p>
           <a href="/dashboard/resume">
             <button className="px-6 py-2 bg-white text-black rounded-full font-bold hover:bg-gray-200">
               Go to Resume
@@ -274,7 +274,7 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[#f8f7ff] text-[#0f172a] p-8">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -307,14 +307,14 @@ export default function JobsPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-8 mb-8"
+            className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8 mb-8"
           >
             <h2 className="text-2xl font-semibold mb-6">Start New Search</h2>
 
             <motion.button
               onClick={handleStartSearch}
               disabled={searchInProgress}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold flex items-center gap-3 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-[#0f172a] rounded-lg font-bold flex items-center gap-3 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -330,7 +330,7 @@ export default function JobsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-8 mb-8"
+              className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8 mb-8"
             >
               <h3 className="text-xl font-semibold mb-4">Search Status</h3>
 
@@ -347,7 +347,7 @@ export default function JobsPage() {
                     <div className="animate-spin w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full" />
                     <span>Searching jobs from multiple sources...</span>
                   </div>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-gray-600 text-sm">
                     Jobs found: {searchStatus.total_jobs_searched} • Matching: {searchStatus.total_matches}
                   </p>
                 </div>
@@ -359,12 +359,12 @@ export default function JobsPage() {
                     <span className="text-2xl">✓</span>
                     <span>Search completed successfully!</span>
                   </div>
-                  <div className="bg-white/5 rounded p-4 space-y-2">
+                  <div className="bg-white rounded p-4 space-y-2">
                     <p className="text-sm text-gray-300">
-                      Total jobs searched: <span className="font-bold text-white">{searchStatus.total_jobs_searched}</span>
+                      Total jobs searched: <span className="font-bold text-[#0f172a]">{searchStatus.total_jobs_searched}</span>
                     </p>
                     <p className="text-sm text-gray-300">
-                      Matches found (≥60%): <span className="font-bold text-white">{searchStatus.total_matches}</span>
+                      Matches found (≥60%): <span className="font-bold text-[#0f172a]">{searchStatus.total_matches}</span>
                     </p>
                   </div>
 
@@ -408,12 +408,12 @@ export default function JobsPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-6 hover:border-white/20 transition-colors"
+                  className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <h3 className="text-xl font-bold mb-2">{match.job.title}</h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
                         <span>{match.job.company}</span>
                         <span>📍 {match.job.location}</span>
                         {match.job.is_remote && <span className="text-green-400">🌍 Remote</span>}
@@ -422,13 +422,13 @@ export default function JobsPage() {
 
                     <div className="text-right">
                       <div className="text-4xl font-black text-green-400">{Math.round(match.match_score)}%</div>
-                      <div className="text-xs text-gray-400">Match Score</div>
+                      <div className="text-xs text-gray-600">Match Score</div>
                     </div>
                   </div>
 
                   {match.match_reasons.length > 0 && (
-                    <div className="mb-4 p-3 bg-white/5 rounded">
-                      <p className="text-xs text-gray-400 mb-2">Why matched:</p>
+                    <div className="mb-4 p-3 bg-white rounded">
+                      <p className="text-xs text-gray-600 mb-2">Why matched:</p>
                       <ul className="space-y-1">
                         {match.match_reasons.slice(0, 3).map((reason, i) => (
                           <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
@@ -441,7 +441,7 @@ export default function JobsPage() {
                   )}
 
                   {match.job.salary_min && (
-                    <p className="text-sm text-gray-400 mb-4">
+                    <p className="text-sm text-gray-600 mb-4">
                       💰 ${match.job.salary_min.toLocaleString()} - ${match.job.salary_max?.toLocaleString()}
                     </p>
                   )}
@@ -471,7 +471,7 @@ export default function JobsPage() {
               animate={{ opacity: 1 }}
               className="text-center py-12"
             >
-              <p className="text-xl text-gray-400">No jobs matched your criteria. Try adjusting your preferences.</p>
+              <p className="text-xl text-gray-600">No jobs matched your criteria. Try adjusting your preferences.</p>
             </motion.div>
           )}
         </AnimatePresence>

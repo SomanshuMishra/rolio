@@ -12,7 +12,7 @@ interface DashboardStats {
 
 const StatCard = ({ icon, label, value, delay }: { icon: string; label: string; value: number; delay: number }) => (
   <motion.div
-    className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-6 hover:border-white/20 transition-colors"
+    className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4 }}
@@ -22,7 +22,7 @@ const StatCard = ({ icon, label, value, delay }: { icon: string; label: string; 
       <div className="text-3xl">{icon}</div>
       <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">+12%</span>
     </div>
-    <p className="text-gray-400 text-sm mb-2">{label}</p>
+    <p className="text-gray-600 text-sm mb-2">{label}</p>
     <motion.p
       className="text-3xl font-bold"
       initial={{ opacity: 0 }}
@@ -88,7 +88,7 @@ export default function DashboardPage() {
         transition={{ duration: 0.4 }}
       >
         <h1 className="text-4xl font-bold mb-2">Welcome back! 👋</h1>
-        <p className="text-gray-400">Here's what's happening with your job search</p>
+        <p className="text-gray-600">Here's what's happening with your job search</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -111,7 +111,7 @@ export default function DashboardPage() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-xl font-semibold mb-2">Upload Your Resume</h3>
-              <p className="text-gray-400 text-sm">Keep your resume up-to-date for better job matches</p>
+              <p className="text-gray-600 text-sm">Keep your resume up-to-date for better job matches</p>
             </div>
             <span className="text-3xl">📄</span>
           </div>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-xl font-semibold mb-2">Find New Jobs</h3>
-              <p className="text-gray-400 text-sm">Search and match with thousands of opportunities</p>
+              <p className="text-gray-600 text-sm">Search and match with thousands of opportunities</p>
             </div>
             <span className="text-3xl">🔍</span>
           </div>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
           ].map((activity, index) => (
             <motion.div
               key={index}
-              className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors"
+              className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-lg hover:bg-white/50 transition-colors"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
@@ -168,8 +168,8 @@ export default function DashboardPage() {
             >
               <span className="text-2xl">{activity.icon}</span>
               <div className="flex-1">
-                <p className="text-white font-medium">{activity.action}</p>
-                <p className="text-gray-400 text-sm">{activity.time}</p>
+                <p className="text-[#0f172a] font-medium">{activity.action}</p>
+                <p className="text-gray-600 text-sm">{activity.time}</p>
               </div>
               <span className="text-gray-600">→</span>
             </motion.div>

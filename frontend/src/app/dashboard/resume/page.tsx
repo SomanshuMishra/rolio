@@ -128,7 +128,7 @@ export default function ResumePage() {
         transition={{ duration: 0.4 }}
       >
         <h1 className="text-4xl font-bold mb-2">Your Resume</h1>
-        <p className="text-gray-400">Upload and manage your resume for job matching</p>
+        <p className="text-gray-600">Upload and manage your resume for job matching</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -138,7 +138,7 @@ export default function ResumePage() {
             className={`border-2 border-dashed rounded-xl p-8 transition-all duration-300 ${
               isDragging
                 ? 'border-blue-500 bg-blue-500/10'
-                : 'border-white/20 bg-white/5 hover:bg-white/10'
+                : 'border-gray-200 bg-white hover:bg-white/50'
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -154,7 +154,7 @@ export default function ResumePage() {
               </motion.div>
 
               <h3 className="text-lg font-semibold mb-2">Drop your resume here</h3>
-              <p className="text-gray-400 text-sm mb-4">or click to browse</p>
+              <p className="text-gray-600 text-sm mb-4">or click to browse</p>
 
               <input
                 ref={fileInputRef}
@@ -174,21 +174,21 @@ export default function ResumePage() {
                 {isUploading ? 'Uploading...' : 'Choose File'}
               </motion.button>
 
-              <p className="text-xs text-gray-500 mt-4">PDF up to 10MB</p>
+              <p className="text-xs text-gray-700 mt-4">PDF up to 10MB</p>
             </div>
 
             {/* Progress indicator */}
             <AnimatePresence>
               {isUploading && (
                 <motion.div
-                  className="mt-4 pt-4 border-t border-white/10"
+                  className="mt-4 pt-4 border-t border-gray-100"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
                   <div className="flex items-center gap-2">
                     <motion.div
-                      className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden"
+                      className="flex-1 h-2 bg-white/50 rounded-full overflow-hidden"
                     >
                       <motion.div
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
@@ -196,7 +196,7 @@ export default function ResumePage() {
                         transition={{ duration: 2, repeat: Infinity }}
                       />
                     </motion.div>
-                    <span className="text-xs text-gray-400">Processing...</span>
+                    <span className="text-xs text-gray-600">Processing...</span>
                   </div>
                 </motion.div>
               )}
@@ -226,7 +226,7 @@ export default function ResumePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <div className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-8">
+            <div className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8">
               <h2 className="text-2xl font-semibold mb-6">Parsed Resume Data</h2>
 
               {/* Basic Info */}
@@ -239,10 +239,10 @@ export default function ResumePage() {
                 >
                   <h3 className="text-lg font-semibold text-blue-400 mb-2">{parsedData.name}</h3>
                   {parsedData.email && (
-                    <p className="text-sm text-gray-400">📧 {parsedData.email}</p>
+                    <p className="text-sm text-gray-600">📧 {parsedData.email}</p>
                   )}
                   {parsedData.phone && (
-                    <p className="text-sm text-gray-400">📱 {parsedData.phone}</p>
+                    <p className="text-sm text-gray-600">📱 {parsedData.phone}</p>
                   )}
                 </motion.div>
               )}
@@ -256,7 +256,7 @@ export default function ResumePage() {
                   transition={{ delay: 0.2 }}
                 >
                   <h4 className="text-sm font-semibold text-gray-300 mb-2">Summary</h4>
-                  <p className="text-sm text-gray-400 line-clamp-3">{parsedData.summary}</p>
+                  <p className="text-sm text-gray-600 line-clamp-3">{parsedData.summary}</p>
                 </motion.div>
               )}
 
@@ -302,13 +302,13 @@ export default function ResumePage() {
                     {parsedData.experience.slice(0, 3).map((exp, index) => (
                       <motion.div
                         key={index}
-                        className="p-3 bg-white/5 rounded-lg border border-white/10"
+                        className="p-3 bg-white rounded-lg border border-gray-100"
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 + index * 0.1 }}
                       >
                         <p className="font-medium text-sm">{exp.role}</p>
-                        <p className="text-xs text-gray-400">{exp.company}</p>
+                        <p className="text-xs text-gray-600">{exp.company}</p>
                       </motion.div>
                     ))}
                   </div>

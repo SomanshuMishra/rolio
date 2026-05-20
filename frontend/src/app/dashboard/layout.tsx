@@ -94,18 +94,18 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="w-full h-screen bg-black flex items-center justify-center">
+      <div className="w-full h-screen bg-[#f8f7ff] flex items-center justify-center">
         <motion.div
           className="flex flex-col items-center gap-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           <motion.div
-            className="w-12 h-12 border-3 border-white/20 border-t-blue-500 rounded-full"
+            className="w-12 h-12 border-3 border-gray-200 border-t-blue-500 rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity }}
           />
-          <p className="text-gray-400">Loading dashboard...</p>
+          <p className="text-gray-600">Loading dashboard...</p>
         </motion.div>
       </div>
     )
@@ -117,7 +117,7 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="bg-black text-white min-h-screen">
+      <div className="bg-[#f8f7ff] text-[#0f172a] min-h-screen">
         <DashboardContent userName={userName} userEmail={userEmail}>
           {children}
         </DashboardContent>
