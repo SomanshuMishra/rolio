@@ -296,22 +296,22 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="min-h-screen text-[#4a4a5e] p-6 md:p-8">
+    <div className="min-h-screen text-[#4a4a5e] p-4 md:p-6 lg:p-8">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
         {/* Hero Section */}
-        <div className="mb-12">
+        <div className="mb-8 md:mb-12">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-black mb-2 gradient-text"
+            className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 gradient-text"
           >
             Job Opportunities
           </motion.h1>
-          <p className="text-lg text-gray-600">AI-matched roles tailored to your profile</p>
+          <p className="text-sm md:text-base lg:text-lg text-gray-600">AI-matched roles tailored to your profile</p>
         </div>
 
         {/* Accumulating Jobs Message */}
@@ -458,13 +458,13 @@ export default function JobsPage() {
               className="space-y-8"
             >
               <div>
-                <h2 className="text-5xl md:text-6xl font-black mb-3 gradient-text">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 md:mb-3 gradient-text">
                   {searchResults.length} Opportunities
                 </h2>
-                <p className="text-lg text-gray-600">Click cards to flip • Page {currentPage} of {totalPages}</p>
+                <p className="text-xs md:text-sm lg:text-base text-gray-600">Click cards to flip • Page {currentPage} of {totalPages}</p>
               </div>
 
-              <div className="space-y-5">
+              <div className="space-y-3 md:space-y-5">
                 {paginatedJobs.map((match, index) => {
                   const scoreColor = match.match_score >= 75 ? 'from-emerald-400 to-green-400' :
                                     match.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
@@ -481,7 +481,7 @@ export default function JobsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.08 }}
                       onClick={() => toggleFlip(match.match_id)}
-                      className={`h-72 rounded-3xl border-3 ${borderColor} bg-white hover:shadow-2xl transition-all cursor-pointer overflow-hidden perspective`}
+                      className={`h-64 md:h-72 rounded-2xl md:rounded-3xl border-2 md:border-3 ${borderColor} bg-white hover:shadow-2xl transition-all cursor-pointer overflow-hidden perspective`}
                       style={{ transformStyle: 'preserve-3d' }}
                     >
                       <motion.div
@@ -495,29 +495,29 @@ export default function JobsPage() {
                           style={{ backfaceVisibility: 'hidden' }}
                           className="w-full h-full p-8 flex flex-col justify-between bg-gradient-to-br from-white via-white to-gray-50"
                         >
-                          <div className="flex items-start gap-8">
+                          <div className="flex items-start gap-3 md:gap-8">
                             {/* Score Circle */}
                             <motion.div
-                              className={`flex-shrink-0 w-32 h-32 rounded-full bg-gradient-to-br ${scoreColor} flex flex-col items-center justify-center shadow-xl`}
+                              className={`flex-shrink-0 w-20 md:w-32 h-20 md:h-32 rounded-full bg-gradient-to-br ${scoreColor} flex flex-col items-center justify-center shadow-xl`}
                               animate={{ rotate: isFlipped ? 180 : 0 }}
                               transition={{ duration: 0.6 }}
                             >
-                              <p className="text-5xl font-black text-white">{Math.round(match.match_score)}</p>
-                              <p className="text-sm font-bold text-white">match</p>
+                              <p className="text-3xl md:text-5xl font-black text-white">{Math.round(match.match_score)}</p>
+                              <p className="text-xs md:text-sm font-bold text-white">match</p>
                             </motion.div>
 
                             {/* Job Details */}
-                            <div className="flex-1 pt-2">
-                              <h3 className="text-3xl font-black text-gray-900 mb-2 leading-tight">{match.job.title}</h3>
-                              <p className="text-xl text-purple-600 font-bold mb-4">{match.job.company}</p>
+                            <div className="flex-1 pt-1 md:pt-2">
+                              <h3 className="text-base md:text-2xl lg:text-3xl font-black text-gray-900 mb-1 md:mb-2 leading-tight">{match.job.title}</h3>
+                              <p className="text-sm md:text-lg lg:text-xl text-purple-600 font-bold mb-2 md:mb-4">{match.job.company}</p>
 
                               {/* Tags */}
-                              <div className="flex flex-wrap gap-3">
-                                <span className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-bold rounded-full">
+                              <div className="flex flex-wrap gap-2 md:gap-3">
+                                <span className="px-2 md:px-4 py-1 md:py-2 bg-gray-200 text-gray-800 text-xs md:text-sm font-bold rounded-full">
                                   📍 {match.job.location}
                                 </span>
                                 {match.job.is_remote && (
-                                  <span className="px-4 py-2 bg-emerald-200 text-emerald-800 text-sm font-bold rounded-full">
+                                  <span className="px-2 md:px-4 py-1 md:py-2 bg-emerald-200 text-emerald-800 text-xs md:text-sm font-bold rounded-full">
                                     🌍 Remote
                                   </span>
                                 )}
@@ -526,11 +526,11 @@ export default function JobsPage() {
                           </div>
 
                           {/* Bottom Section */}
-                          <div className="flex items-end justify-between gap-4 mt-6 pt-6 border-t-2 border-gray-200">
+                          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-3 md:gap-4 mt-3 md:mt-6 pt-3 md:pt-6 border-t-2 border-gray-200">
                             {match.job.salary_min && (
                               <div>
-                                <p className="text-sm text-gray-500 font-semibold mb-1">Salary</p>
-                                <p className="text-2xl font-black text-gray-900">
+                                <p className="text-xs md:text-sm text-gray-500 font-semibold mb-1">Salary</p>
+                                <p className="text-lg md:text-2xl font-black text-gray-900">
                                   ${(match.job.salary_min / 1000).toFixed(0)}K - ${(match.job.salary_max! / 1000).toFixed(0)}K
                                 </p>
                               </div>
@@ -539,7 +539,7 @@ export default function JobsPage() {
                               href={match.job.apply_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-8 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl text-lg font-bold hover:shadow-xl transition-all"
+                              className="w-full md:w-auto px-4 md:px-8 py-2 md:py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg md:rounded-xl text-sm md:text-lg font-bold hover:shadow-xl transition-all text-center"
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={(e) => e.stopPropagation()}

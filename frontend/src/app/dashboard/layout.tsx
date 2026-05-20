@@ -17,6 +17,16 @@ function DashboardContent({
   userEmail: string
 }) {
   const { isCollapsed } = useSidebar()
+  const [isMobile, setIsMobile] = useState(true)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   return (
     <>
@@ -25,9 +35,10 @@ function DashboardContent({
 
       {/* Main content */}
       <motion.main
-        className={`pt-0 min-h-screen transition-all duration-300 bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7] ${
-          isCollapsed ? 'ml-[68px]' : 'ml-[260px]'
-        }`}
+        className="pt-0 min-h-screen transition-all duration-300 bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7]"
+        style={{
+          marginLeft: isMobile ? 0 : (isCollapsed ? 68 : 260),
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}

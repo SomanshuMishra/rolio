@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSidebar } from '@/contexts/SidebarContext'
@@ -15,6 +15,16 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
   const router = useRouter()
   const { isCollapsed } = useSidebar()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(true)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleLogout = async () => {
     localStorage.removeItem('access_token')
@@ -24,17 +34,18 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
 
   return (
     <motion.header
-      className={`sticky top-0 z-40 bg-gradient-to-r from-white/95 to-white/95 backdrop-blur-sm border-b border-purple-100 transition-all duration-300 ${
-        isCollapsed ? 'ml-[68px]' : 'ml-[260px]'
-      }`}
+      className="sticky top-0 z-40 bg-gradient-to-r from-white/95 to-white/95 backdrop-blur-sm border-b border-purple-100 transition-all duration-300"
+      style={{
+        marginLeft: isMobile ? 0 : (isCollapsed ? 68 : 260),
+      }}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="px-8 py-4 flex items-center justify-between">
-        {/* Left side - Search */}
+      <div className="px-4 md:px-8 py-4 flex items-center justify-between">
+        {/* Left side - Search (hidden on mobile) */}
         <motion.div
-          className="flex-1 max-w-sm"
+          className="flex-1 max-w-sm hidden md:block"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
