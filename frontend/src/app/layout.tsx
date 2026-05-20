@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '@/components/Toast'
 import PWAInstall from '@/components/PWAInstall'
+import InstallButton from '@/components/InstallButton'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -96,6 +97,7 @@ export default function RootLayout({
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
       <body className="bg-[#030712] text-slate-300 font-body">
         <PWAInstall />
+        <InstallButton />
         <ToastProvider>
           {children}
         </ToastProvider>
