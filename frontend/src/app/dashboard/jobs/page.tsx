@@ -552,28 +552,48 @@ export default function JobsPage() {
                         {/* Back */}
                         <div
                           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                          className="w-full h-full p-8 flex flex-col bg-gradient-to-br from-purple-50 to-blue-50"
+                          className="w-full h-full p-8 flex flex-col justify-between bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100"
                         >
-                          <h4 className="text-2xl font-black text-gray-900 mb-6">Why You Match</h4>
-                          <div className="flex-1 overflow-y-auto space-y-4">
-                            {match.match_reasons && match.match_reasons.length > 0 ? (
-                              match.match_reasons.slice(0, 4).map((reason, i) => (
-                                <motion.div
-                                  key={i}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: i * 0.1 }}
-                                  className="flex items-start gap-4 p-4 bg-white rounded-xl border-2 border-emerald-200"
-                                >
-                                  <span className="text-2xl flex-shrink-0">✓</span>
-                                  <p className="text-gray-800 font-medium text-lg">{reason}</p>
-                                </motion.div>
-                              ))
-                            ) : (
-                              <div className="text-gray-600 text-lg">Strong match for your profile</div>
-                            )}
+                          <div>
+                            <h4 className="text-3xl font-black text-gray-900 mb-6">Why Match?</h4>
+                            <div className="space-y-3">
+                              {match.match_reasons && match.match_reasons.length > 0 ? (
+                                match.match_reasons.slice(0, 3).map((reason, i) => (
+                                  <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="flex items-start gap-3 p-3 bg-white/90 rounded-lg border-l-4 border-emerald-400"
+                                  >
+                                    <span className="text-2xl flex-shrink-0 text-emerald-500">✓</span>
+                                    <p className="text-gray-800 font-semibold text-base leading-tight">{reason}</p>
+                                  </motion.div>
+                                ))
+                              ) : (
+                                <>
+                                  <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="flex items-start gap-3 p-3 bg-white/90 rounded-lg border-l-4 border-emerald-400"
+                                  >
+                                    <span className="text-2xl flex-shrink-0 text-emerald-500">✓</span>
+                                    <p className="text-gray-800 font-semibold">Strong match for your skills</p>
+                                  </motion.div>
+                                  <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="flex items-start gap-3 p-3 bg-white/90 rounded-lg border-l-4 border-emerald-400"
+                                  >
+                                    <span className="text-2xl flex-shrink-0 text-emerald-500">✓</span>
+                                    <p className="text-gray-800 font-semibold">Experience level aligns well</p>
+                                  </motion.div>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-xs text-gray-500 text-center mt-6">← Click to flip back</p>
+                          <p className="text-sm text-gray-600 text-center font-medium">← Click to flip back</p>
                         </div>
                       </motion.div>
                     </motion.div>
@@ -586,30 +606,30 @@ export default function JobsPage() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex items-center justify-center gap-4 mt-12 pb-8"
+                  className="flex items-center justify-center gap-3 mt-12 pb-8 flex-wrap"
                 >
                   <motion.button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="px-5 py-2 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.92 }}
                   >
-                    ← Previous
+                    ← Prev
                   </motion.button>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-2 border-2 border-pink-200">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <motion.button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`w-12 h-12 rounded-full font-bold text-lg transition-all ${
+                        className={`w-10 h-10 rounded-md font-bold text-sm transition-all ${
                           page === currentPage
                             ? 'bg-gradient-to-r from-pink-400 to-purple-400 text-white shadow-lg'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.9 }}
                       >
                         {page}
                       </motion.button>
@@ -619,9 +639,9 @@ export default function JobsPage() {
                   <motion.button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
-                    className="px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="px-5 py-2 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.92 }}
                   >
                     Next →
                   </motion.button>
