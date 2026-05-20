@@ -44,6 +44,18 @@ export default function JobsPage() {
   const [searchStatus, setSearchStatus] = useState<SearchStatus | null>(null)
   const [searchResults, setSearchResults] = useState<JobMatch[]>([])
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const JOBS_PER_PAGE = 5
+  const totalPages = Math.ceil(searchResults.length / JOBS_PER_PAGE)
+  const paginatedJobs = searchResults.slice(
+    (currentPage - 1) * JOBS_PER_PAGE,
+    currentPage * JOBS_PER_PAGE
+  )
+
+  // Flip state for cards
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set())
+
   // Check for search_id in URL on mount
   useEffect(() => {
     const urlSearchId = searchParams.get('search_id')
@@ -196,6 +208,16 @@ export default function JobsPage() {
       console.error('Failed to start search:', error)
       setSearchInProgress(false)
     }
+  }
+
+  const toggleFlip = (cardId: string) => {
+    const newFlipped = new Set(flippedCards)
+    if (newFlipped.has(cardId)) {
+      newFlipped.delete(cardId)
+    } else {
+      newFlipped.add(cardId)
+    }
+    setFlippedCards(newFlipped)
   }
 
   const handleDownloadExcel = () => {
@@ -427,87 +449,184 @@ export default function JobsPage() {
           )}
         </AnimatePresence>
 
-        {/* Job Results Grid */}
+        {/* Job Results */}
         <AnimatePresence>
           {searchStatus?.status === 'completed' && searchResults.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
+              className="space-y-8"
             >
               <div>
-                <h2 className="text-4xl font-black mb-2 gradient-text">
+                <h2 className="text-5xl md:text-6xl font-black mb-3 gradient-text">
                   {searchResults.length} Opportunities
                 </h2>
-                <p className="text-gray-600">Click to flip and see why you match</p>
+                <p className="text-lg text-gray-600">Click cards to flip • Page {currentPage} of {totalPages}</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {searchResults.map((match, index) => {
+              <div className="space-y-5">
+                {paginatedJobs.map((match, index) => {
                   const scoreColor = match.match_score >= 75 ? 'from-emerald-400 to-green-400' :
                                     match.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
                                     'from-red-400 to-rose-400'
                   const borderColor = match.match_score >= 75 ? 'border-emerald-300' :
                                      match.match_score >= 60 ? 'border-amber-300' :
                                      'border-red-300'
+                  const isFlipped = flippedCards.has(match.match_id)
 
                   return (
                     <motion.div
                       key={match.match_id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className={`h-80 rounded-2xl border-2 ${borderColor} bg-white hover:shadow-xl transition-all cursor-pointer overflow-hidden`}
+                      transition={{ delay: index * 0.08 }}
+                      onClick={() => toggleFlip(match.match_id)}
+                      className={`h-72 rounded-3xl border-3 ${borderColor} bg-white hover:shadow-2xl transition-all cursor-pointer overflow-hidden perspective`}
+                      style={{ transformStyle: 'preserve-3d' }}
                     >
-                      <div className="h-full p-6 flex flex-col">
-                        {/* Match Score Badge */}
-                        <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${scoreColor} flex items-center justify-center mb-4 mx-auto shadow-lg`}>
-                          <div className="text-center">
-                            <p className="text-2xl font-black text-white">{Math.round(match.match_score)}</p>
-                            <p className="text-xs font-bold text-white">match</p>
+                      <motion.div
+                        animate={{ rotateY: isFlipped ? 180 : 0 }}
+                        transition={{ duration: 0.6 }}
+                        style={{ transformStyle: 'preserve-3d' }}
+                        className="w-full h-full"
+                      >
+                        {/* Front */}
+                        <div
+                          style={{ backfaceVisibility: 'hidden' }}
+                          className="w-full h-full p-8 flex flex-col justify-between bg-gradient-to-br from-white via-white to-gray-50"
+                        >
+                          <div className="flex items-start gap-8">
+                            {/* Score Circle */}
+                            <motion.div
+                              className={`flex-shrink-0 w-32 h-32 rounded-full bg-gradient-to-br ${scoreColor} flex flex-col items-center justify-center shadow-xl`}
+                              animate={{ rotate: isFlipped ? 180 : 0 }}
+                              transition={{ duration: 0.6 }}
+                            >
+                              <p className="text-5xl font-black text-white">{Math.round(match.match_score)}</p>
+                              <p className="text-sm font-bold text-white">match</p>
+                            </motion.div>
+
+                            {/* Job Details */}
+                            <div className="flex-1 pt-2">
+                              <h3 className="text-3xl font-black text-gray-900 mb-2 leading-tight">{match.job.title}</h3>
+                              <p className="text-xl text-purple-600 font-bold mb-4">{match.job.company}</p>
+
+                              {/* Tags */}
+                              <div className="flex flex-wrap gap-3">
+                                <span className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-bold rounded-full">
+                                  📍 {match.job.location}
+                                </span>
+                                {match.job.is_remote && (
+                                  <span className="px-4 py-2 bg-emerald-200 text-emerald-800 text-sm font-bold rounded-full">
+                                    🌍 Remote
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Bottom Section */}
+                          <div className="flex items-end justify-between gap-4 mt-6 pt-6 border-t-2 border-gray-200">
+                            {match.job.salary_min && (
+                              <div>
+                                <p className="text-sm text-gray-500 font-semibold mb-1">Salary</p>
+                                <p className="text-2xl font-black text-gray-900">
+                                  ${(match.job.salary_min / 1000).toFixed(0)}K - ${(match.job.salary_max! / 1000).toFixed(0)}K
+                                </p>
+                              </div>
+                            )}
+                            <motion.a
+                              href={match.job.apply_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-8 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl text-lg font-bold hover:shadow-xl transition-all"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Apply →
+                            </motion.a>
                           </div>
                         </div>
 
-                        {/* Job Info */}
-                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-center">{match.job.title}</h3>
-                        <p className="text-sm text-purple-600 font-semibold text-center mb-3">{match.job.company}</p>
-
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mb-4 justify-center">
-                          <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
-                            📍 {match.job.location}
-                          </span>
-                          {match.job.is_remote && (
-                            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">
-                              🌍 Remote
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Salary */}
-                        {match.job.salary_min && (
-                          <p className="text-sm text-gray-600 text-center mb-auto">
-                            💰 ${(match.job.salary_min / 1000).toFixed(0)}K - ${(match.job.salary_max! / 1000).toFixed(0)}K
-                          </p>
-                        )}
-
-                        {/* Apply Button */}
-                        <motion.a
-                          href={match.job.apply_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full py-2 px-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg text-sm font-bold text-center mt-4 hover:shadow-lg transition-all"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={(e) => e.stopPropagation()}
+                        {/* Back */}
+                        <div
+                          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                          className="w-full h-full p-8 flex flex-col bg-gradient-to-br from-purple-50 to-blue-50"
                         >
-                          Apply Now →
-                        </motion.a>
-                      </div>
+                          <h4 className="text-2xl font-black text-gray-900 mb-6">Why You Match</h4>
+                          <div className="flex-1 overflow-y-auto space-y-4">
+                            {match.match_reasons && match.match_reasons.length > 0 ? (
+                              match.match_reasons.slice(0, 4).map((reason, i) => (
+                                <motion.div
+                                  key={i}
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: i * 0.1 }}
+                                  className="flex items-start gap-4 p-4 bg-white rounded-xl border-2 border-emerald-200"
+                                >
+                                  <span className="text-2xl flex-shrink-0">✓</span>
+                                  <p className="text-gray-800 font-medium text-lg">{reason}</p>
+                                </motion.div>
+                              ))
+                            ) : (
+                              <div className="text-gray-600 text-lg">Strong match for your profile</div>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 text-center mt-6">← Click to flip back</p>
+                        </div>
+                      </motion.div>
                     </motion.div>
                   )
                 })}
               </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center justify-center gap-4 mt-12 pb-8"
+                >
+                  <motion.button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    ← Previous
+                  </motion.button>
+
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <motion.button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-12 h-12 rounded-full font-bold text-lg transition-all ${
+                          page === currentPage
+                            ? 'bg-gradient-to-r from-pink-400 to-purple-400 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {page}
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <motion.button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Next →
+                  </motion.button>
+                </motion.div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
