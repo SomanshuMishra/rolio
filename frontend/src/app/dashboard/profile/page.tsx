@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
         <div className="max-w-2xl">
           <motion.div
-            className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8"
+            className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -35,7 +35,7 @@ export default function ProfilePage() {
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
+                  className="w-full px-4 py-2 bg-white border border-purple-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
                   placeholder="John Doe"
                 />
               </div>
@@ -46,7 +46,7 @@ export default function ProfilePage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
+                  className="w-full px-4 py-2 bg-white border border-purple-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
                   placeholder="john@example.com"
                 />
               </div>
@@ -57,7 +57,7 @@ export default function ProfilePage() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
+                  className="w-full px-4 py-2 bg-white border border-purple-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
                   placeholder="+1 (555) 123-4567"
                 />
               </div>
@@ -68,7 +68,7 @@ export default function ProfilePage() {
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
+                  className="w-full px-4 py-2 bg-white border border-purple-100 rounded-lg text-[#0f172a] focus:border-blue-500 transition-colors outline-none"
                   placeholder="San Francisco, CA"
                 />
               </div>

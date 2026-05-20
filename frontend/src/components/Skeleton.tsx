@@ -56,7 +56,7 @@ export function SkeletonText({ lines = 3 }: { lines?: number }) {
 
 export function JobCardSkeleton() {
   return (
-    <div className="h-80 p-6 bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl space-y-4">
+    <div className="h-80 p-6 bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl space-y-4">
       <div className="flex justify-between items-start">
         <div className="flex-1 space-y-2">
           <Skeleton height="24px" width="80%" />
@@ -64,7 +64,7 @@ export function JobCardSkeleton() {
         </div>
         <Skeleton height="120px" width="120px" circle />
       </div>
-      <div className="space-y-3 border-t border-gray-100 pt-4">
+      <div className="space-y-3 border-t border-purple-100 pt-4">
         <Skeleton height="16px" width="40%" />
         <Skeleton height="16px" width="60%" />
         <div className="flex gap-2">

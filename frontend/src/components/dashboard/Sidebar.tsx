@@ -113,7 +113,7 @@ export default function Sidebar() {
         layout
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-400 to-purple-300 flex items-center justify-center flex-shrink-0">
             <span className="text-[#0f172a] font-display font-bold">R</span>
           </div>
           <AnimatePresence mode="wait">
@@ -198,7 +198,7 @@ export default function Sidebar() {
                           <Icon
                             size={20}
                             className={`transition-colors duration-200 ${
-                              isActive ? 'text-indigo-400' : 'text-[#0f172a]/50 group-hover:text-[#0f172a]/70'
+                              isActive ? 'text-pink-400' : 'text-[#0f172a]/50 group-hover:text-[#0f172a]/70'
                             }`}
                           />
                         </div>

@@ -38,7 +38,7 @@ export default function AnimatedInput({
       <div className="relative">
         {/* Icon */}
         {icon && (
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 group-focus-within:text-indigo-600">
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 group-focus-within:text-purple-500">
             {icon}
           </div>
         )}
@@ -54,17 +54,17 @@ export default function AnimatedInput({
           placeholder={placeholder}
           className={`w-full px-4 py-3 ${
             icon ? 'pl-12' : ''
-          } bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none transition-all duration-300 ${
+          } bg-white border border-pink-100 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none transition-all duration-300 ${
             error
               ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
               : isFocused
-                ? 'border-indigo-400 bg-white ring-4 ring-indigo-50'
-                : 'hover:border-gray-300'
+                ? 'border-purple-300 bg-white ring-4 ring-purple-50'
+                : 'hover:border-purple-200'
           }`}
           animate={{
             boxShadow: isFocused
-              ? '0 0 20px rgba(99, 102, 241, 0.1)'
-              : '0 0 0px rgba(99, 102, 241, 0)',
+              ? '0 0 20px rgba(217, 165, 245, 0.15)'
+              : '0 0 0px rgba(217, 165, 245, 0)',
           }}
           transition={{ duration: 0.3 }}
         />
@@ -76,7 +76,7 @@ export default function AnimatedInput({
           animate={{
             y: value || isFocused ? -24 : 12,
             scale: value || isFocused ? 0.85 : 1,
-            color: error ? 'rgb(239, 68, 68)' : isFocused ? 'rgb(99, 102, 241)' : 'rgb(107, 114, 128)',
+            color: error ? 'rgb(239, 68, 68)' : isFocused ? 'rgb(217, 165, 245)' : 'rgb(120, 113, 108)',
           }}
           transition={{ duration: 0.2 }}
         >

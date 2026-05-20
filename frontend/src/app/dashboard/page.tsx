@@ -12,7 +12,7 @@ interface DashboardStats {
 
 const StatCard = ({ icon, label, value, delay }: { icon: string; label: string; value: number; delay: number }) => (
   <motion.div
-    className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
+    className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4 }}
@@ -160,7 +160,7 @@ export default function DashboardPage() {
           ].map((activity, index) => (
             <motion.div
               key={index}
-              className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-lg hover:bg-white/50 transition-colors"
+              className="flex items-center gap-4 p-4 bg-white border border-purple-100 rounded-lg hover:bg-white/50 transition-colors"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}

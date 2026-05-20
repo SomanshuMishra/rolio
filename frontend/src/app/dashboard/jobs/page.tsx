@@ -307,7 +307,7 @@ export default function JobsPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8 mb-8"
+            className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-8 mb-8"
           >
             <h2 className="text-2xl font-semibold mb-6">Start New Search</h2>
 
@@ -330,7 +330,7 @@ export default function JobsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8 mb-8"
+              className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-8 mb-8"
             >
               <h3 className="text-xl font-semibold mb-4">Search Status</h3>
 
@@ -408,7 +408,7 @@ export default function JobsPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
+                  className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-6 hover:border-gray-200 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">

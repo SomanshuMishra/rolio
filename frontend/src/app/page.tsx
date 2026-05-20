@@ -96,7 +96,7 @@ export default function LandingPage() {
             <Link href="/auth/register">
               <motion.button
                 ref={ctaRef}
-                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-[#0f172a] rounded-full glow smooth-transition hover:shadow-2xl relative overflow-hidden group"
+                className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-pink-400 to-purple-300 text-[#0f172a] rounded-full glow smooth-transition hover:shadow-2xl relative overflow-hidden group"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
@@ -161,7 +161,7 @@ export default function LandingPage() {
       >
         <div className="w-6 h-10 border-2 border-gray-600 rounded-full flex items-center justify-center">
           <motion.div
-            className="w-1 h-2 bg-gradient-to-b from-indigo-600 to-violet-600 rounded-full"
+            className="w-1 h-2 bg-gradient-to-b from-pink-400 to-purple-300 rounded-full"
             animate={{ y: [0, 8] }}
             transition={{ duration: 2, repeat: Infinity }}
           />

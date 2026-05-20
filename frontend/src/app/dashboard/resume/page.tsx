@@ -181,7 +181,7 @@ export default function ResumePage() {
             <AnimatePresence>
               {isUploading && (
                 <motion.div
-                  className="mt-4 pt-4 border-t border-gray-100"
+                  className="mt-4 pt-4 border-t border-purple-100"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -226,7 +226,7 @@ export default function ResumePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <div className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-xl p-8">
+            <div className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-xl p-8">
               <h2 className="text-2xl font-semibold mb-6">Parsed Resume Data</h2>
 
               {/* Basic Info */}
@@ -302,7 +302,7 @@ export default function ResumePage() {
                     {parsedData.experience.slice(0, 3).map((exp, index) => (
                       <motion.div
                         key={index}
-                        className="p-3 bg-white rounded-lg border border-gray-100"
+                        className="p-3 bg-white rounded-lg border border-purple-100"
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 + index * 0.1 }}

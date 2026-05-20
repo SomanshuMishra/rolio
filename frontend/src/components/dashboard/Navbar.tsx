@@ -24,7 +24,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
 
   return (
     <motion.header
-      className={`sticky top-0 z-40 bg-gradient-to-r from-white/95 to-white/95 backdrop-blur-sm border-b border-gray-100 transition-all duration-300 ${
+      className={`sticky top-0 z-40 bg-gradient-to-r from-white/95 to-white/95 backdrop-blur-sm border-b border-purple-100 transition-all duration-300 ${
         isCollapsed ? 'ml-[68px]' : 'ml-[260px]'
       }`}
       initial={{ opacity: 0, y: -20 }}
@@ -43,7 +43,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
             <input
               type="text"
               placeholder="Search jobs, preferences..."
-              className="w-full px-4 py-2 bg-white border border-gray-100 rounded-lg text-sm text-[#0f172a] placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
+              className="w-full px-4 py-2 bg-white border border-purple-100 rounded-lg text-sm text-[#0f172a] placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
             />
             <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-700">🔍</span>
           </div>
@@ -88,7 +88,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
-                  className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden z-50"
+                  className="absolute right-0 mt-2 w-48 bg-white border border-purple-100 rounded-lg shadow-lg overflow-hidden z-50"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -110,7 +110,7 @@ export default function Navbar({ userName = 'User', userEmail = '' }: NavbarProp
                       ⚙️ Settings
                     </motion.div>
                   </Link>
-                  <div className="border-t border-gray-100" />
+                  <div className="border-t border-purple-100" />
                   <motion.button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 hover:bg-red-500/20 text-sm text-red-400 cursor-pointer transition-colors flex items-center gap-2"

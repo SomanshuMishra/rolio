@@ -67,11 +67,11 @@ export default function Modal({ isOpen, onClose, title, children, actions }: Mod
             animate="visible"
             exit="exit"
             onClick={(e) => e.stopPropagation()}
-            className="bg-gradient-to-br from-white to-white border border-gray-100 rounded-2xl max-w-md w-full mx-4 overflow-hidden"
+            className="bg-gradient-to-br from-white to-white border border-purple-100 rounded-2xl max-w-md w-full mx-4 overflow-hidden"
           >
             {/* Header */}
             {title && (
-              <div className="px-6 py-4 border-b border-gray-100">
+              <div className="px-6 py-4 border-b border-purple-100">
                 <h2 className="text-xl font-bold">{title}</h2>
               </div>
             )}
@@ -81,7 +81,7 @@ export default function Modal({ isOpen, onClose, title, children, actions }: Mod
 
             {/* Actions */}
             {actions && actions.length > 0 && (
-              <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
+              <div className="px-6 py-4 border-t border-purple-100 flex gap-3">
                 {actions.map((action, idx) => (
                   <motion.button
                     key={idx}

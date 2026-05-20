@@ -93,9 +93,9 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     >
       {/* Card background */}
       <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-pink-500/5 rounded-2xl blur-xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-200/20 to-blue-200/20 rounded-2xl blur-xl" />
 
-        <div className="relative bg-white border border-gray-100 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="relative bg-white border border-pink-100/50 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
           {/* Header */}
           <div className="mb-8">
             <motion.h1
@@ -184,7 +184,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.4 }}
           >
-            <Link href="#" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors">
+            <Link href="#" className="text-purple-400 hover:text-purple-500 text-sm font-medium transition-colors">
               Forgot password?
             </Link>
           </motion.div>
@@ -193,7 +193,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           <motion.button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-[#0f172a] font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group shadow-md hover:shadow-lg"
+            className="w-full py-3 px-6 bg-gradient-to-r from-pink-400 to-purple-300 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group shadow-md hover:shadow-lg"
             whileHover={{ scale: isLoading ? 1 : 1.02 }}
             whileTap={{ scale: isLoading ? 1 : 0.98 }}
             initial={{ opacity: 0, y: 10 }}
@@ -223,13 +223,13 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
           {/* Register link */}
           <motion.p
-            className="text-center mt-6 text-gray-600 text-sm"
+            className="text-center mt-6 text-gray-500 text-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.4 }}
           >
             Don't have an account?{' '}
-            <Link href="/auth/register" className="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors">
+            <Link href="/auth/register" className="text-pink-400 hover:text-pink-500 font-semibold transition-colors">
               Sign up now
             </Link>
           </motion.p>

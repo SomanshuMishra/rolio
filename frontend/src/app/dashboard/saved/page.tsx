@@ -166,7 +166,7 @@ export default function SavedJobsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -300 }}
                   transition={{ delay: index * 0.05 }}
-                  className="group bg-gradient-to-r from-white/50 to-gray-800/50 border border-gray-100 rounded-2xl p-6 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-blue-500/10"
+                  className="group bg-gradient-to-r from-white/50 to-gray-800/50 border border-purple-100 rounded-2xl p-6 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-blue-500/10"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -233,7 +233,7 @@ export default function SavedJobsPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       transition={{ delay: 0.15 }}
-                      className="mt-4 pt-4 border-t border-gray-100"
+                      className="mt-4 pt-4 border-t border-purple-100"
                     >
                       <p className="text-xs font-bold uppercase text-gray-600 mb-3">Why you'd be great</p>
                       <ul className="space-y-2">
