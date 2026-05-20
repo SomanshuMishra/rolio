@@ -55,7 +55,7 @@ export default function JobsPage() {
     }
   }, [searchParams])
 
-  // Check if resume exists
+  // Check if resume exists and load old cached matches
   useEffect(() => {
     const checkResume = async () => {
       try {
@@ -67,6 +67,29 @@ export default function JobsPage() {
         })
 
         setHasResume(resumeResponse.ok)
+
+        // Load old cached matches if no active search
+        if (!searchParams.get('search_id')) {
+          try {
+            const matchesResponse = await fetch(`${apiUrl}/api/jobs/matches?limit=1000`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            const matchesData = await matchesResponse.json()
+            console.log('Old cached matches:', matchesData)
+            if (matchesData.matches && matchesData.matches.length > 0) {
+              setSearchResults(matchesData.matches)
+              // Set a dummy status to show old results
+              setSearchStatus({
+                search_id: 'cached',
+                status: 'completed',
+                total_jobs_searched: matchesData.total || 0,
+                total_matches: matchesData.matches.length,
+              })
+            }
+          } catch (error) {
+            console.error('Failed to load cached matches:', error)
+          }
+        }
       } catch (error) {
         console.error('Failed to check resume:', error)
       } finally {
