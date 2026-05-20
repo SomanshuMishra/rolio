@@ -18,8 +18,10 @@ function DashboardContent({
 }) {
   const { isCollapsed } = useSidebar()
   const [isMobile, setIsMobile] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }
@@ -30,7 +32,9 @@ function DashboardContent({
 
   return (
     <>
-      <Sidebar />
+      {/* Only render sidebar on desktop */}
+      {isClient && !isMobile && <Sidebar />}
+
       <Navbar userName={userName} userEmail={userEmail} />
 
       {/* Main content */}

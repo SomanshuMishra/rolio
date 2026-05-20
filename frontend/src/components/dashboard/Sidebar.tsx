@@ -104,7 +104,7 @@ export default function Sidebar() {
 
   return (
     <motion.aside
-      className="hidden md:block fixed left-0 top-0 h-screen bg-gradient-to-b from-white via-white/98 to-pink-50/80 border-r border-pink-100/50 backdrop-blur-sm z-40"
+      className="fixed left-0 top-0 h-screen bg-gradient-to-b from-white via-white/98 to-pink-50/80 border-r border-pink-100/50 backdrop-blur-sm z-40"
       animate={{ width: isCollapsed ? 68 : 260 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
