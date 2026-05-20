@@ -83,7 +83,7 @@ export default function Sidebar() {
           setBadgeCounts({ jobs: total, saved })
         }
 
-        const resumeResponse = await fetch(`${apiUrl}/api/resume`, {
+        const resumeResponse = await fetch(`${apiUrl}/api/resume/`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         setHasResume(resumeResponse.ok)

@@ -53,7 +53,7 @@ export default function JobsPage() {
           console.error('Failed to fetch skills:', skillsError)
         }
 
-        const resumeResponse = await fetch(`${apiUrl}/api/resume`, {
+        const resumeResponse = await fetch(`${apiUrl}/api/resume/`, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
