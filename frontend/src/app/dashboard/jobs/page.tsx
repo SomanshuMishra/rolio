@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
 import * as XLSX from 'xlsx'
+import AIAssistantOrb from '@/components/ai/AIAssistantOrb'
 
 const MIN_MATCH_SCORE = 60
 
@@ -48,6 +49,10 @@ export default function JobsPage() {
   // Selected job state
   const [selectedJob, setSelectedJob] = useState<JobMatch | null>(null)
   const [isMobileDetailOpen, setIsMobileDetailOpen] = useState(false)
+
+  // Success animation state (shows for 3s after search completes)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const successTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Check for search_id in URL on mount
   useEffect(() => {
@@ -105,11 +110,14 @@ export default function JobsPage() {
     checkResume()
   }, [])
 
-  // Cleanup polling on unmount
+  // Cleanup polling and success timeout on unmount
   useEffect(() => {
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current)
+      }
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current)
       }
     }
   }, [])
@@ -151,6 +159,11 @@ export default function JobsPage() {
               if (jobs.length > 0) {
                 setSelectedJob(jobs[0])
               }
+
+              // Trigger success animation for 3s
+              setIsSuccess(true)
+              if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current)
+              successTimeoutRef.current = setTimeout(() => setIsSuccess(false), 3000)
 
               // Show notification
               if ('Notification' in window && Notification.permission === 'granted') {
@@ -285,6 +298,17 @@ export default function JobsPage() {
 
   return (
     <div className="min-h-screen text-[#4a4a5e] p-4 md:p-6 lg:p-8">
+      {/* AI Assistant Orb */}
+      <AIAssistantOrb
+        isThinking={searchInProgress && searchStatus?.status === 'pending'}
+        isSearching={searchInProgress && searchStatus?.status === 'in_progress'}
+        isSuccess={isSuccess}
+        matchCount={searchResults.length}
+        onClick={handleStartSearch}
+        size={typeof window !== 'undefined' && window.innerWidth < 768 ? 56 : 80}
+        position="bottom-right"
+      />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

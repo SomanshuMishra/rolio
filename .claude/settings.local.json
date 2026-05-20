@@ -58,7 +58,8 @@
       "Bash(git commit -m 'Implement async job search with Excel export *)",
       "Bash(git commit -m 'Light theme redesign: Complete UI overhaul with light backgrounds, dark text, and funky animations *)",
       "Bash(ssh *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git checkout *)"
     ]
   }
 }
