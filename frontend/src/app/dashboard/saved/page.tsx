@@ -75,7 +75,7 @@ export default function SavedJobsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f8f7ff] text-[#0f172a] pt-20 px-6">
+      <div className="min-h-screen text-slate-300 pt-8 px-4 md:px-6">
         <motion.div
           className="flex justify-center items-center py-20"
           initial={{ opacity: 0 }}
@@ -84,7 +84,7 @@ export default function SavedJobsPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-12 h-12 border-3 border-gray-200 border-t-blue-500 rounded-full"
+            className="w-12 h-12 border-3 border-cyan-500 border-t-purple-500 rounded-full"
           />
         </motion.div>
       </div>
@@ -92,21 +92,21 @@ export default function SavedJobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f7ff] text-[#0f172a] pt-20 px-6">
+    <div className="min-h-screen text-slate-300 pt-8 px-4 md:px-6">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-5xl font-black mb-2">❤️ SAVED JOBS</h1>
-          <p className="text-gray-600">{sortedJobs.length} job{sortedJobs.length !== 1 ? 's' : ''} saved</p>
+          <h1 className="text-4xl md:text-5xl font-black mb-2 ai-text">❤️ SAVED JOBS</h1>
+          <p className="text-slate-400 text-sm md:text-base">{sortedJobs.length} job{sortedJobs.length !== 1 ? 's' : ''} saved</p>
         </div>
 
         {/* Sort Options */}
         {sortedJobs.length > 0 && (
-          <div className="mb-6 flex gap-3">
+          <div className="mb-6 flex gap-3 flex-wrap">
             <motion.button
               onClick={() => setSortBy('date')}
-              className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
-                sortBy === 'date' ? 'bg-blue-600 text-[#0f172a]' : 'bg-white/50 text-gray-600 hover:bg-white/20'
+              className={`px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all ${
+                sortBy === 'date' ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white neon-glow-cyan' : 'cyber-glass border border-cyan-500/30 text-slate-400 hover:border-cyan-400/50'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -115,8 +115,8 @@ export default function SavedJobsPage() {
             </motion.button>
             <motion.button
               onClick={() => setSortBy('score')}
-              className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
-                sortBy === 'score' ? 'bg-blue-600 text-[#0f172a]' : 'bg-white/50 text-gray-600 hover:bg-white/20'
+              className={`px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all ${
+                sortBy === 'score' ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white neon-glow-cyan' : 'cyber-glass border border-cyan-500/30 text-slate-400 hover:border-cyan-400/50'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -131,7 +131,7 @@ export default function SavedJobsPage() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-500/20 border border-red-500/50 text-red-200 px-6 py-4 rounded-lg mb-6"
+            className="cyber-glass border border-red-500/50 text-red-400 px-6 py-4 rounded-lg mb-6"
           >
             {error}
           </motion.div>
@@ -144,9 +144,15 @@ export default function SavedJobsPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-20"
           >
-            <div className="text-6xl mb-4">📭</div>
-            <h2 className="text-2xl font-bold mb-2">No Saved Jobs Yet</h2>
-            <p className="text-gray-600 mb-6">Save jobs from the Jobs page to review them later</p>
+            <motion.div
+              className="text-6xl mb-4"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              📭
+            </motion.div>
+            <h2 className="text-xl md:text-2xl font-bold mb-2 text-cyan-300">No Saved Jobs Yet</h2>
+            <p className="text-slate-400 text-sm md:text-base mb-6">Save jobs from the Jobs page to review them later</p>
             <motion.a
               href="/dashboard/jobs"
               className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold transition-colors"
