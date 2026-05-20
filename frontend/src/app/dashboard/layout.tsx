@@ -25,7 +25,7 @@ function DashboardContent({
 
       {/* Main content */}
       <motion.main
-        className={`pt-0 min-h-screen transition-all duration-300 ${
+        className={`pt-0 min-h-screen transition-all duration-300 bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7] ${
           isCollapsed ? 'ml-[68px]' : 'ml-[260px]'
         }`}
         initial={{ opacity: 0 }}
@@ -94,18 +94,18 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="w-full h-screen bg-[#f8f7ff] flex items-center justify-center">
+      <div className="w-full h-screen bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7] flex items-center justify-center">
         <motion.div
           className="flex flex-col items-center gap-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           <motion.div
-            className="w-12 h-12 border-3 border-gray-200 border-t-blue-500 rounded-full"
+            className="w-12 h-12 border-3 border-pink-300 border-t-purple-400 rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity }}
           />
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-purple-600 font-medium">Loading dashboard...</p>
         </motion.div>
       </div>
     )
@@ -117,7 +117,7 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="bg-[#f8f7ff] text-[#0f172a] min-h-screen">
+      <div className="bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7] text-[#4a4a5e] min-h-screen">
         <DashboardContent userName={userName} userEmail={userEmail}>
           {children}
         </DashboardContent>

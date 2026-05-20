@@ -104,13 +104,13 @@ export default function Sidebar() {
 
   return (
     <motion.aside
-      className="fixed left-0 top-0 h-screen bg-white/95 border-r border-pink-100 backdrop-blur-xl"
+      className="fixed left-0 top-0 h-screen bg-gradient-to-b from-white via-white/98 to-pink-50/80 border-r border-pink-100/50 backdrop-blur-sm"
       animate={{ width: isCollapsed ? 68 : 260 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
       {/* Logo Section */}
       <motion.div
-        className="p-4 border-b border-pink-100 h-20 flex items-center justify-between bg-gradient-to-r from-white via-pink-50 to-white"
+        className="p-4 border-b border-pink-100/50 h-20 flex items-center justify-between bg-gradient-to-r from-white/80 via-pink-50/50 to-white/80"
         layout
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -146,7 +146,7 @@ export default function Sidebar() {
       </motion.div>
 
       {/* Navigation Sections */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 bg-gradient-to-b from-transparent via-white/20 to-pink-50/30">
         {NAVIGATION_SECTIONS.map((section, sectionIdx) => (
           <motion.div key={section.label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: sectionIdx * 0.1 }}>
             <AnimatePresence mode="wait">
@@ -181,7 +181,7 @@ export default function Sidebar() {
                         className={`relative px-3 py-2.5 rounded-lg cursor-pointer flex items-center gap-3 transition-all duration-200 group ${
                           isActive
                             ? `${item.color} shadow-md text-white`
-                            : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                            : 'bg-white/40 hover:bg-white/60 text-gray-700 hover:text-gray-900'
                         }`}
                         whileTap={{ scale: 0.96 }}
                       >
