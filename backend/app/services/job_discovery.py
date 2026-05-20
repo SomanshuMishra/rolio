@@ -11,8 +11,11 @@ async def fetch_remoteok_jobs(limit: int = 100) -> List[Dict[str, Any]]:
     """Fetch jobs from RemoteOK public API."""
     try:
         logger.info(f"Fetching jobs from RemoteOK API...")
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
         async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get("https://remoteok.com/api")
+            response = await client.get("https://remoteok.com/api", headers=headers)
             response.raise_for_status()
             all_jobs = response.json()
 
@@ -59,54 +62,38 @@ async def fetch_jsearch_smart_queries(
     preferences: Dict[str, Any],
     limit: int = 30,
 ) -> List[Dict[str, Any]]:
-    """Generate smart search queries using AI and fetch from JSearch."""
-    from .ai_provider import get_ai_provider
+    """Fetch jobs from JSearch using role-based queries."""
     from .jsearch_client import JSearchClient
 
     try:
-        logger.info(f"Generating smart JSearch queries using {ai_provider}...")
-        provider = get_ai_provider(ai_provider, api_key)
+        logger.info(f"Fetching from JSearch with smart queries...")
 
         roles = preferences.get("preferred_roles", [])
-        preferred_role = roles[0] if roles else "software engineer"
-        skills = extract_skills_from_resume(resume_text)
+        locations = preferences.get("preferred_locations", [])
 
-        prompt = f"""Based on this resume excerpt and target role, suggest 5 specific job search queries that would find the best matches.
+        # Generate simple search queries from roles
+        queries = []
+        for role in roles[:3]:
+            queries.append(role)
+            if "remote" in preferences.get("remote_preference", "").lower() or preferences.get("remote_preference") == "any":
+                queries.append(f"{role} remote")
 
-Resume excerpt: {resume_text[:500]}
-
-Target role: {preferred_role}
-Skills: {", ".join(skills[:10])}
-
-Return ONLY a JSON array of 5 search query strings, like:
-["Python developer remote", "Full stack engineer AWS", ...]
-
-No markdown, no explanation, just the JSON array."""
-
-        response = await provider.analyze(prompt)
-
-        try:
-            # Try to parse JSON directly
-            if "[" in response:
-                json_str = response[response.index("["):response.rindex("]")+1]
-                queries = json.loads(json_str)
-            else:
-                queries = [preferred_role]
-        except:
-            queries = [preferred_role]
+        if not queries:
+            queries = ["software engineer", "software engineer remote"]
 
         logger.info(f"Generated queries: {queries}")
 
         jsearch = JSearchClient()
         all_jobs = []
+        location = locations[0] if locations else None
 
         for query in queries[:5]:
             try:
                 logger.info(f"  Searching JSearch for: {query}")
                 jobs = await jsearch.search_jobs(
                     query=query,
-                    location=preferences.get("preferred_locations", [None])[0],
-                    limit=limit // 5,
+                    location=location,
+                    limit=limit // len(queries),
                 )
                 if jobs:
                     all_jobs.extend(jobs)
@@ -115,11 +102,13 @@ No markdown, no explanation, just the JSON array."""
                 logger.error(f"  Error searching for '{query}': {e}")
                 continue
 
-        logger.info(f"✓ JSearch smart queries returned {len(all_jobs)} jobs")
+        logger.info(f"✓ JSearch returned {len(all_jobs)} jobs")
         return all_jobs
 
     except Exception as e:
-        logger.error(f"Error in smart JSearch: {str(e)}")
+        logger.error(f"Error in JSearch: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return []
 
 

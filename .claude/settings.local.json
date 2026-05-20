@@ -51,7 +51,9 @@
       "Bash(sqlite3 auto_apply_jobs.db \"SELECT id, jsearch_id, title FROM jobs LIMIT 5;\")",
       "Bash(/opt/homebrew/Cellar/python@3.11/3.11.14_1/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8001)",
       "Bash(chmod +x /Users/somanshumishra/myspace/auto-apply-jobs/scripts/setup-ec2.sh)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git commit -m 'Fix job discovery bugs and API compatibility issues *)"
     ]
   }
 }
