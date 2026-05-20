@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { X } from 'lucide-react'
 import * as XLSX from 'xlsx'
 
 const MIN_MATCH_SCORE = 60
@@ -44,17 +45,9 @@ export default function JobsPage() {
   const [searchStatus, setSearchStatus] = useState<SearchStatus | null>(null)
   const [searchResults, setSearchResults] = useState<JobMatch[]>([])
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const JOBS_PER_PAGE = 5
-  const totalPages = Math.ceil(searchResults.length / JOBS_PER_PAGE)
-  const paginatedJobs = searchResults.slice(
-    (currentPage - 1) * JOBS_PER_PAGE,
-    currentPage * JOBS_PER_PAGE
-  )
-
-  // Flip state for cards
-  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set())
+  // Selected job state
+  const [selectedJob, setSelectedJob] = useState<JobMatch | null>(null)
+  const [isMobileDetailOpen, setIsMobileDetailOpen] = useState(false)
 
   // Check for search_id in URL on mount
   useEffect(() => {
@@ -89,6 +82,7 @@ export default function JobsPage() {
             console.log('Old cached matches:', matchesData)
             if (matchesData.matches && matchesData.matches.length > 0) {
               setSearchResults(matchesData.matches)
+              setSelectedJob(matchesData.matches[0])
               // Set a dummy status to show old results
               setSearchStatus({
                 search_id: 'cached',
@@ -152,12 +146,16 @@ export default function JobsPage() {
               )
               const resultsData = await resultsResponse.json()
               console.log('Search results:', resultsData)
-              setSearchResults(resultsData.matches || [])
+              const jobs = resultsData.matches || []
+              setSearchResults(jobs)
+              if (jobs.length > 0) {
+                setSelectedJob(jobs[0])
+              }
 
               // Show notification
               if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('Rolio Job Search Complete', {
-                  body: `Found ${resultsData.matches?.length || 0} matching jobs!`,
+                  body: `Found ${jobs.length} matching jobs!`,
                   icon: '/favicon.svg',
                 })
               }
@@ -208,16 +206,6 @@ export default function JobsPage() {
       console.error('Failed to start search:', error)
       setSearchInProgress(false)
     }
-  }
-
-  const toggleFlip = (cardId: string) => {
-    const newFlipped = new Set(flippedCards)
-    if (newFlipped.has(cardId)) {
-      newFlipped.delete(cardId)
-    } else {
-      newFlipped.add(cardId)
-    }
-    setFlippedCards(newFlipped)
   }
 
   const handleDownloadExcel = () => {
@@ -449,204 +437,287 @@ export default function JobsPage() {
           )}
         </AnimatePresence>
 
-        {/* Job Results */}
+        {/* Job Results - Two Column Layout */}
         <AnimatePresence>
           {searchStatus?.status === 'completed' && searchResults.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-8"
+              className="space-y-6"
             >
-              <div>
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 md:mb-3 gradient-text">
-                  {searchResults.length} Opportunities
-                </h2>
-                <p className="text-xs md:text-sm lg:text-base text-gray-600">Click cards to flip • Page {currentPage} of {totalPages}</p>
+              {/* Header */}
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 gradient-text">
+                    {searchResults.length} Opportunities
+                  </h2>
+                  <p className="text-xs md:text-sm text-gray-600">Click a job to see details</p>
+                </div>
+                {searchResults.length > 0 && (
+                  <motion.button
+                    onClick={handleDownloadExcel}
+                    className="px-6 py-3 bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl font-bold text-sm md:text-base whitespace-nowrap shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    📥 Download (Excel)
+                  </motion.button>
+                )}
               </div>
 
-              <div className="space-y-3 md:space-y-5">
-                {paginatedJobs.map((match, index) => {
-                  const scoreColor = match.match_score >= 75 ? 'from-emerald-400 to-green-400' :
-                                    match.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
-                                    'from-red-400 to-rose-400'
-                  const borderColor = match.match_score >= 75 ? 'border-emerald-300' :
-                                     match.match_score >= 60 ? 'border-amber-300' :
-                                     'border-red-300'
-                  const isFlipped = flippedCards.has(match.match_id)
+              {/* Two Column Layout */}
+              <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-300px)] md:h-[calc(100vh-280px)]">
+                {/* Left: Job List */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="w-full md:w-96 flex-shrink-0 space-y-2 overflow-y-auto pr-2"
+                >
+                  {searchResults.map((match, index) => {
+                    const scoreColor = match.match_score >= 75 ? 'from-emerald-400 to-green-400' :
+                                      match.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
+                                      'from-red-400 to-rose-400'
+                    const isSelected = selectedJob?.match_id === match.match_id
 
-                  return (
-                    <motion.div
-                      key={match.match_id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.08 }}
-                      onClick={() => toggleFlip(match.match_id)}
-                      className={`h-64 md:h-72 rounded-2xl md:rounded-3xl border-2 md:border-3 ${borderColor} bg-white hover:shadow-2xl transition-all cursor-pointer overflow-hidden perspective`}
-                      style={{ transformStyle: 'preserve-3d' }}
-                    >
-                      <motion.div
-                        animate={{ rotateY: isFlipped ? 180 : 0 }}
-                        transition={{ duration: 0.6 }}
-                        style={{ transformStyle: 'preserve-3d' }}
-                        className="w-full h-full"
+                    return (
+                      <motion.button
+                        key={match.match_id}
+                        onClick={() => {
+                          setSelectedJob(match)
+                          setIsMobileDetailOpen(true)
+                        }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className={`w-full p-4 rounded-xl text-left transition-all ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-pink-300 to-purple-300 text-white shadow-lg border-2 border-pink-400'
+                            : 'bg-white border-2 border-gray-100 hover:border-purple-200 hover:shadow-md'
+                        }`}
                       >
-                        {/* Front */}
-                        <div
-                          style={{ backfaceVisibility: 'hidden' }}
-                          className="w-full h-full p-8 flex flex-col justify-between bg-gradient-to-br from-white via-white to-gray-50"
-                        >
-                          <div className="flex items-start gap-3 md:gap-8">
-                            {/* Score Circle */}
-                            <motion.div
-                              className={`flex-shrink-0 w-20 md:w-32 h-20 md:h-32 rounded-full bg-gradient-to-br ${scoreColor} flex flex-col items-center justify-center shadow-xl`}
-                              animate={{ rotate: isFlipped ? 180 : 0 }}
-                              transition={{ duration: 0.6 }}
-                            >
-                              <p className="text-3xl md:text-5xl font-black text-white">{Math.round(match.match_score)}</p>
-                              <p className="text-xs md:text-sm font-bold text-white">match</p>
-                            </motion.div>
-
-                            {/* Job Details */}
-                            <div className="flex-1 pt-1 md:pt-2">
-                              <h3 className="text-base md:text-2xl lg:text-3xl font-black text-gray-900 mb-1 md:mb-2 leading-tight">{match.job.title}</h3>
-                              <p className="text-sm md:text-lg lg:text-xl text-purple-600 font-bold mb-2 md:mb-4">{match.job.company}</p>
-
-                              {/* Tags */}
-                              <div className="flex flex-wrap gap-2 md:gap-3">
-                                <span className="px-2 md:px-4 py-1 md:py-2 bg-gray-200 text-gray-800 text-xs md:text-sm font-bold rounded-full">
-                                  📍 {match.job.location}
-                                </span>
-                                {match.job.is_remote && (
-                                  <span className="px-2 md:px-4 py-1 md:py-2 bg-emerald-200 text-emerald-800 text-xs md:text-sm font-bold rounded-full">
-                                    🌍 Remote
-                                  </span>
-                                )}
-                              </div>
-                            </div>
+                        <div className="flex items-start gap-3">
+                          <div className={`flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br ${scoreColor} flex items-center justify-center`}>
+                            <span className="text-sm font-black text-white">{Math.round(match.match_score)}</span>
                           </div>
-
-                          {/* Bottom Section */}
-                          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-3 md:gap-4 mt-3 md:mt-6 pt-3 md:pt-6 border-t-2 border-gray-200">
+                          <div className="flex-1 min-w-0">
+                            <h3 className={`font-bold text-sm truncate ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                              {match.job.title}
+                            </h3>
+                            <p className={`text-xs truncate ${isSelected ? 'text-white/90' : 'text-purple-600'}`}>
+                              {match.job.company}
+                            </p>
                             {match.job.salary_min && (
-                              <div>
-                                <p className="text-xs md:text-sm text-gray-500 font-semibold mb-1">Salary</p>
-                                <p className="text-lg md:text-2xl font-black text-gray-900">
-                                  ${(match.job.salary_min / 1000).toFixed(0)}K - ${(match.job.salary_max! / 1000).toFixed(0)}K
-                                </p>
-                              </div>
+                              <p className={`text-xs font-semibold mt-1 ${isSelected ? 'text-white/80' : 'text-gray-600'}`}>
+                                ${(match.job.salary_min / 1000).toFixed(0)}K - ${(match.job.salary_max! / 1000).toFixed(0)}K
+                              </p>
                             )}
-                            <motion.a
-                              href={match.job.apply_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="w-full md:w-auto px-4 md:px-8 py-2 md:py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg md:rounded-xl text-sm md:text-lg font-bold hover:shadow-xl transition-all text-center"
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Apply →
-                            </motion.a>
                           </div>
                         </div>
+                      </motion.button>
+                    )
+                  })}
+                </motion.div>
 
-                        {/* Back */}
-                        <div
-                          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                          className="w-full h-full p-8 flex flex-col justify-between bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100"
+                {/* Right: Job Detail Panel (Desktop Only) */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="hidden md:flex flex-1 flex-col"
+                >
+                  {selectedJob ? (
+                    <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-8 overflow-y-auto h-full sticky top-0">
+                      {/* Score and Title */}
+                      <div className="flex items-start gap-6 mb-8">
+                        <div className={`flex-shrink-0 w-24 h-24 rounded-full bg-gradient-to-br ${
+                          selectedJob.match_score >= 75 ? 'from-emerald-400 to-green-400' :
+                          selectedJob.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
+                          'from-red-400 to-rose-400'
+                        } flex items-center justify-center shadow-xl`}>
+                          <div className="text-center">
+                            <p className="text-4xl font-black text-white">{Math.round(selectedJob.match_score)}</p>
+                            <p className="text-xs font-bold text-white">match</p>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-3xl font-black text-gray-900 mb-2">{selectedJob.job.title}</h2>
+                          <p className="text-xl font-bold text-purple-600 mb-4">{selectedJob.job.company}</p>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-3 py-1 bg-gray-200 text-gray-800 text-sm font-bold rounded-full">
+                              📍 {selectedJob.job.location}
+                            </span>
+                            {selectedJob.job.is_remote && (
+                              <span className="px-3 py-1 bg-emerald-200 text-emerald-800 text-sm font-bold rounded-full">
+                                🌍 Remote
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Salary */}
+                      {selectedJob.job.salary_min && (
+                        <div className="mb-8 pb-8 border-b-2 border-gray-200">
+                          <p className="text-sm text-gray-500 font-semibold mb-2">Salary Range</p>
+                          <p className="text-3xl font-black text-gray-900">
+                            ${(selectedJob.job.salary_min / 1000).toFixed(0)}K - ${(selectedJob.job.salary_max! / 1000).toFixed(0)}K
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Why Match */}
+                      <div className="mb-8">
+                        <h3 className="text-xl font-black text-gray-900 mb-4">Why This Matches</h3>
+                        <div className="space-y-3">
+                          {selectedJob.match_reasons && selectedJob.match_reasons.length > 0 ? (
+                            selectedJob.match_reasons.map((reason, i) => (
+                              <motion.div
+                                key={i}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border-l-4 border-emerald-400"
+                              >
+                                <span className="text-xl flex-shrink-0 text-emerald-500">✓</span>
+                                <p className="text-gray-800 font-semibold">{reason}</p>
+                              </motion.div>
+                            ))
+                          ) : (
+                            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border-l-4 border-emerald-400">
+                              <span className="text-xl flex-shrink-0 text-emerald-500">✓</span>
+                              <p className="text-gray-800 font-semibold">Strong match for your profile</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Apply Button */}
+                      <motion.a
+                        href={selectedJob.job.apply_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full px-6 py-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:shadow-xl transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Apply Now →
+                      </motion.a>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-gray-500 text-lg font-semibold">Select a job to view details</p>
+                    </div>
+                  )}
+                </motion.div>
+              </div>
+
+              {/* Mobile Detail Bottom Sheet */}
+              <AnimatePresence>
+                {selectedJob && isMobileDetailOpen && (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setIsMobileDetailOpen(false)}
+                      className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 400 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 400 }}
+                      transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                      className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 md:hidden max-h-[90vh] overflow-y-auto"
+                    >
+                      {/* Close Button */}
+                      <div className="sticky top-0 bg-white border-b-2 border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
+                        <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto" />
+                        <motion.button
+                          onClick={() => setIsMobileDetailOpen(false)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          whileTap={{ scale: 0.9 }}
                         >
-                          <div>
-                            <h4 className="text-3xl font-black text-gray-900 mb-6">Why Match?</h4>
-                            <div className="space-y-3">
-                              {match.match_reasons && match.match_reasons.length > 0 ? (
-                                match.match_reasons.slice(0, 3).map((reason, i) => (
-                                  <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: i * 0.1 }}
-                                    className="flex items-start gap-3 p-3 bg-white/90 rounded-lg border-l-4 border-emerald-400"
-                                  >
-                                    <span className="text-2xl flex-shrink-0 text-emerald-500">✓</span>
-                                    <p className="text-gray-800 font-semibold text-base leading-tight">{reason}</p>
-                                  </motion.div>
-                                ))
-                              ) : (
-                                <>
-                                  <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="flex items-start gap-3 p-3 bg-white/90 rounded-lg border-l-4 border-emerald-400"
-                                  >
-                                    <span className="text-2xl flex-shrink-0 text-emerald-500">✓</span>
-                                    <p className="text-gray-800 font-semibold">Strong match for your skills</p>
-                                  </motion.div>
-                                  <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.1 }}
-                                    className="flex items-start gap-3 p-3 bg-white/90 rounded-lg border-l-4 border-emerald-400"
-                                  >
-                                    <span className="text-2xl flex-shrink-0 text-emerald-500">✓</span>
-                                    <p className="text-gray-800 font-semibold">Experience level aligns well</p>
-                                  </motion.div>
-                                </>
+                          <X size={24} className="text-gray-600" />
+                        </motion.button>
+                      </div>
+
+                      <div className="p-6 space-y-6">
+                        {/* Score and Title */}
+                        <div className="flex items-start gap-4">
+                          <div className={`flex-shrink-0 w-20 h-20 rounded-full bg-gradient-to-br ${
+                            selectedJob.match_score >= 75 ? 'from-emerald-400 to-green-400' :
+                            selectedJob.match_score >= 60 ? 'from-amber-400 to-yellow-400' :
+                            'from-red-400 to-rose-400'
+                          } flex items-center justify-center shadow-lg`}>
+                            <div className="text-center">
+                              <p className="text-3xl font-black text-white">{Math.round(selectedJob.match_score)}</p>
+                              <p className="text-xs font-bold text-white">match</p>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h2 className="text-2xl font-black text-gray-900 mb-2">{selectedJob.job.title}</h2>
+                            <p className="text-lg font-bold text-purple-600 mb-3">{selectedJob.job.company}</p>
+                            <div className="flex flex-wrap gap-2">
+                              <span className="px-2 py-1 bg-gray-200 text-gray-800 text-xs font-bold rounded-full">
+                                📍 {selectedJob.job.location}
+                              </span>
+                              {selectedJob.job.is_remote && (
+                                <span className="px-2 py-1 bg-emerald-200 text-emerald-800 text-xs font-bold rounded-full">
+                                  🌍 Remote
+                                </span>
                               )}
                             </div>
                           </div>
-                          <p className="text-sm text-gray-600 text-center font-medium">← Click to flip back</p>
                         </div>
-                      </motion.div>
+
+                        {/* Salary */}
+                        {selectedJob.job.salary_min && (
+                          <div className="pb-6 border-b-2 border-gray-200">
+                            <p className="text-sm text-gray-500 font-semibold mb-2">Salary Range</p>
+                            <p className="text-2xl font-black text-gray-900">
+                              ${(selectedJob.job.salary_min / 1000).toFixed(0)}K - ${(selectedJob.job.salary_max! / 1000).toFixed(0)}K
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Why Match */}
+                        <div>
+                          <h3 className="text-lg font-black text-gray-900 mb-3">Why This Matches</h3>
+                          <div className="space-y-2">
+                            {selectedJob.match_reasons && selectedJob.match_reasons.length > 0 ? (
+                              selectedJob.match_reasons.map((reason, i) => (
+                                <div
+                                  key={i}
+                                  className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border-l-4 border-emerald-400"
+                                >
+                                  <span className="text-lg flex-shrink-0 text-emerald-500">✓</span>
+                                  <p className="text-sm text-gray-800 font-semibold">{reason}</p>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border-l-4 border-emerald-400">
+                                <span className="text-lg flex-shrink-0 text-emerald-500">✓</span>
+                                <p className="text-sm text-gray-800 font-semibold">Strong match for your profile</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Apply Button */}
+                        <motion.a
+                          href={selectedJob.job.apply_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-xl transition-all"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          Apply Now →
+                        </motion.a>
+                      </div>
                     </motion.div>
-                  )
-                })}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-center justify-center gap-3 mt-12 pb-8 flex-wrap"
-                >
-                  <motion.button
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="px-5 py-2 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.92 }}
-                  >
-                    ← Prev
-                  </motion.button>
-
-                  <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-2 border-2 border-pink-200">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <motion.button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`w-10 h-10 rounded-md font-bold text-sm transition-all ${
-                          page === currentPage
-                            ? 'bg-gradient-to-r from-pink-400 to-purple-400 text-white shadow-lg'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                        whileHover={{ scale: 1.08 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        {page}
-                      </motion.button>
-                    ))}
-                  </div>
-
-                  <motion.button
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-5 py-2 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-lg font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.92 }}
-                  >
-                    Next →
-                  </motion.button>
-                </motion.div>
-              )}
+                  </>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>
