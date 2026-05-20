@@ -1,4 +1,4 @@
-from .user import User, APIKey, UserPreferences, RefreshToken
+from .user import User, APIKey, UserPreferences, RefreshToken, JobSearch
 from .resume import Resume
 from .job import Job, UserJobMatch, UserJobAction
 
@@ -7,6 +7,7 @@ __all__ = [
     "APIKey",
     "UserPreferences",
     "RefreshToken",
+    "JobSearch",
     "Resume",
     "Job",
     "UserJobMatch",
