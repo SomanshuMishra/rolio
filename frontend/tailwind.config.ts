@@ -26,8 +26,17 @@ const config: Config = {
           900: '#2d2675',
           950: '#1e1b4b',
         },
-        primary: '#6366f1',
+        primary: '#06b6d4',
         secondary: '#8b5cf6',
+        cyber: {
+          dark: '#030712',
+          darker: '#0f1729',
+          surface: 'rgba(15, 23, 42, 0.8)',
+          'glass': 'rgba(15, 23, 42, 0.7)',
+          accent: '#06b6d4',
+          'accent-purple': '#8b5cf6',
+          'accent-pink': '#ec4899',
+        },
       },
       animation: {
         shimmer: 'shimmer 2s infinite',
