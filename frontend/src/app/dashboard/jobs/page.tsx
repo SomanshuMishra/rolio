@@ -267,11 +267,11 @@ export default function JobsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f8f7ff] flex items-center justify-center">
+      <div className="min-h-screen bg-[#030712] flex items-center justify-center relative">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="w-12 h-12 border-3 border-gray-200 border-t-white rounded-full"
+          className="w-12 h-12 border-3 border-cyan-500 border-t-purple-500 rounded-full"
         />
       </div>
     )
@@ -279,17 +279,29 @@ export default function JobsPage() {
 
   if (!hasResume) {
     return (
-      <div className="min-h-screen bg-[#f8f7ff] flex items-center justify-center">
+      <div className="min-h-screen bg-[#030712] flex items-center justify-center relative p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
+          className="text-center cyber-glass border border-cyan-500/30 rounded-xl p-8 md:p-12 max-w-md"
         >
-          <p className="text-[#0f172a] text-2xl mb-4">📄 Upload resume first</p>
+          <motion.p
+            className="text-3xl md:text-4xl mb-4"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            📄
+          </motion.p>
+          <p className="text-cyan-300 text-xl md:text-2xl mb-2 font-semibold">Upload resume first</p>
+          <p className="text-slate-400 text-sm md:text-base mb-6">Start your journey to find the perfect job match</p>
           <a href="/dashboard/resume">
-            <button className="px-6 py-2 bg-white text-black rounded-full font-bold hover:bg-gray-200">
+            <motion.button
+              className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-lg font-bold neon-glow-cyan"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Go to Resume
-            </button>
+            </motion.button>
           </a>
         </motion.div>
       </div>
@@ -297,7 +309,7 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="min-h-screen text-[#4a4a5e] p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen text-slate-300 p-4 md:p-6 lg:p-8 relative">
       {/* AI Assistant Orb */}
       <AIAssistantOrb
         isThinking={searchInProgress && searchStatus?.status === 'pending'}
@@ -319,11 +331,11 @@ export default function JobsPage() {
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 gradient-text"
+            className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 ai-text"
           >
             Job Opportunities
           </motion.h1>
-          <p className="text-sm md:text-base lg:text-lg text-gray-600">AI-matched roles tailored to your profile</p>
+          <p className="text-sm md:text-base lg:text-lg text-slate-400">AI-matched roles tailored to your profile</p>
         </div>
 
         {/* Accumulating Jobs Message */}
@@ -333,17 +345,17 @@ export default function JobsPage() {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20 }}
-              className="mb-8 bg-gradient-to-br from-cyan-300/20 to-blue-300/20 border-2 border-cyan-300/50 rounded-2xl p-10 text-center backdrop-blur-sm"
+              className="mb-8 cyber-glass border border-cyan-500/50 rounded-2xl p-8 md:p-10 text-center"
             >
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-400 to-blue-400 flex items-center justify-center"
+                className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center"
               >
                 <span className="text-2xl">✨</span>
               </motion.div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Accumulating Jobs for You</h2>
-              <p className="text-gray-700">Searching multiple sources and matching with your profile...</p>
+              <h2 className="text-xl md:text-2xl font-bold text-cyan-300 mb-2">Accumulating Jobs for You</h2>
+              <p className="text-slate-400 text-sm md:text-base">Searching multiple sources and matching with your profile...</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -358,11 +370,11 @@ export default function JobsPage() {
             <motion.button
               onClick={handleStartSearch}
               disabled={searchInProgress}
-              className="w-full md:w-auto px-8 py-5 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-2xl transition-all disabled:opacity-50"
-              whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(244, 114, 182, 0.3)' }}
+              className="w-full md:w-auto px-6 md:px-8 py-3 md:py-5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white rounded-2xl font-bold text-base md:text-lg flex items-center justify-center gap-3 neon-glow-cyan transition-all disabled:opacity-50"
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="text-2xl">🔍</span> Find Jobs Now
+              <span className="text-xl md:text-2xl">🔍</span> Find Jobs Now
             </motion.button>
           </motion.div>
         )}
@@ -378,39 +390,39 @@ export default function JobsPage() {
             >
               {searchStatus.status === 'pending' && (
                 <motion.div
-                  className="bg-gradient-to-br from-yellow-300/30 to-amber-300/30 border-2 border-yellow-300/50 rounded-2xl p-8 flex items-center gap-4"
-                  animate={{ boxShadow: '0 0 20px rgba(253, 224, 71, 0.2)' }}
+                  className="cyber-glass border border-cyan-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4"
+                  animate={{ boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)' }}
                 >
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-8 h-8 border-3 border-yellow-400 border-t-transparent rounded-full flex-shrink-0"
+                    className="w-8 h-8 border-3 border-cyan-500 border-t-purple-500 rounded-full flex-shrink-0"
                   />
-                  <span className="text-gray-900 font-semibold">Initializing search...</span>
+                  <span className="text-cyan-300 font-semibold text-sm md:text-base">Initializing search...</span>
                 </motion.div>
               )}
 
               {searchStatus.status === 'in_progress' && (
                 <div className="space-y-4">
                   <motion.div
-                    className="bg-gradient-to-br from-blue-300/30 to-cyan-300/30 border-2 border-blue-300/50 rounded-2xl p-8 flex items-center gap-4"
-                    animate={{ boxShadow: '0 0 20px rgba(59, 130, 246, 0.2)' }}
+                    className="cyber-glass border border-cyan-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4"
+                    animate={{ boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)' }}
                   >
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="w-8 h-8 border-3 border-blue-400 border-t-transparent rounded-full flex-shrink-0"
+                      className="w-8 h-8 border-3 border-cyan-500 border-t-purple-500 rounded-full flex-shrink-0"
                     />
-                    <span className="text-gray-900 font-semibold">Searching jobs from multiple sources...</span>
+                    <span className="text-cyan-300 font-semibold text-sm md:text-base">Searching jobs from multiple sources...</span>
                   </motion.div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <motion.div className="bg-gradient-to-br from-orange-300/30 to-yellow-300/30 border-2 border-orange-300/50 rounded-2xl p-6">
-                      <p className="text-sm text-gray-600 mb-1">Total Jobs Searched</p>
-                      <p className="text-4xl font-black text-orange-600">{searchStatus.total_jobs_searched}</p>
+                    <motion.div className="cyber-glass border border-cyan-500/30 rounded-2xl p-6">
+                      <p className="text-xs md:text-sm text-slate-400 mb-1">Total Jobs Searched</p>
+                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_jobs_searched}</p>
                     </motion.div>
-                    <motion.div className="bg-gradient-to-br from-green-300/30 to-emerald-300/30 border-2 border-green-300/50 rounded-2xl p-6">
-                      <p className="text-sm text-gray-600 mb-1">Matches Found</p>
-                      <p className="text-4xl font-black text-green-600">{searchStatus.total_matches}</p>
+                    <motion.div className="cyber-glass border border-purple-500/30 rounded-2xl p-6">
+                      <p className="text-xs md:text-sm text-slate-400 mb-1">Matches Found</p>
+                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_matches}</p>
                     </motion.div>
                   </div>
                 </div>
@@ -419,29 +431,35 @@ export default function JobsPage() {
               {searchStatus.status === 'completed' && (
                 <div className="space-y-4">
                   <motion.div
-                    className="bg-gradient-to-br from-emerald-400/30 to-green-400/30 border-2 border-emerald-400/50 rounded-2xl p-8 flex items-center gap-4"
-                    animate={{ boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' }}
+                    className="cyber-glass border border-cyan-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4"
+                    animate={{ boxShadow: '0 0 30px rgba(6, 182, 212, 0.3)' }}
                   >
-                    <span className="text-4xl">✓</span>
+                    <motion.span
+                      className="text-4xl"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      ✓
+                    </motion.span>
                     <div>
-                      <p className="text-lg font-bold text-gray-900">Search Completed!</p>
-                      <p className="text-sm text-gray-700">Your job matches are ready</p>
+                      <p className="text-base md:text-lg font-bold text-cyan-300">Search Completed!</p>
+                      <p className="text-xs md:text-sm text-slate-400">Your job matches are ready</p>
                     </div>
                   </motion.div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <motion.div className="bg-gradient-to-br from-blue-300/30 to-purple-300/30 border-2 border-blue-300/50 rounded-2xl p-6">
-                      <p className="text-sm text-gray-600 mb-1">Total Searched</p>
-                      <p className="text-4xl font-black text-blue-600">{searchStatus.total_jobs_searched}</p>
+                    <motion.div className="cyber-glass border border-cyan-500/30 rounded-2xl p-6">
+                      <p className="text-xs md:text-sm text-slate-400 mb-1">Total Searched</p>
+                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_jobs_searched}</p>
                     </motion.div>
-                    <motion.div className="bg-gradient-to-br from-pink-300/30 to-rose-300/30 border-2 border-pink-300/50 rounded-2xl p-6">
-                      <p className="text-sm text-gray-600 mb-1">Qualified Matches</p>
-                      <p className="text-4xl font-black text-pink-600">{searchStatus.total_matches}</p>
+                    <motion.div className="cyber-glass border border-purple-500/30 rounded-2xl p-6">
+                      <p className="text-xs md:text-sm text-slate-400 mb-1">Qualified Matches</p>
+                      <p className="text-3xl md:text-4xl font-black ai-text">{searchStatus.total_matches}</p>
                     </motion.div>
                   </div>
                   {searchResults.length > 0 && (
                     <motion.button
                       onClick={handleDownloadExcel}
-                      className="w-full py-3 px-6 bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg"
+                      className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 neon-glow-cyan"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -452,9 +470,9 @@ export default function JobsPage() {
               )}
 
               {searchStatus.status === 'failed' && (
-                <motion.div className="bg-gradient-to-br from-red-300/30 to-rose-300/30 border-2 border-red-300/50 rounded-2xl p-8 flex items-center gap-4">
+                <motion.div className="cyber-glass border border-red-500/50 rounded-2xl p-6 md:p-8 flex items-center gap-4">
                   <span className="text-4xl">✗</span>
-                  <span className="text-gray-900 font-semibold">Search failed. Please try again.</span>
+                  <span className="text-red-400 font-semibold text-sm md:text-base">Search failed. Please try again.</span>
                 </motion.div>
               )}
             </motion.div>
@@ -472,15 +490,15 @@ export default function JobsPage() {
               {/* Header */}
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div>
-                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 gradient-text">
+                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 ai-text">
                     {searchResults.length} Opportunities
                   </h2>
-                  <p className="text-xs md:text-sm text-gray-600">Click a job to see details</p>
+                  <p className="text-xs md:text-sm text-slate-400">Click a job to see details</p>
                 </div>
                 {searchResults.length > 0 && (
                   <motion.button
                     onClick={handleDownloadExcel}
-                    className="px-6 py-3 bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl font-bold text-sm md:text-base whitespace-nowrap shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white rounded-xl font-bold text-xs md:text-sm whitespace-nowrap neon-glow-cyan"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
