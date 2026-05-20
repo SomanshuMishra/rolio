@@ -119,16 +119,16 @@ export default function JobsPage() {
               const resultsData = await resultsResponse.json()
               console.log('Search results:', resultsData)
               setSearchResults(resultsData.matches || [])
+
+              // Show notification
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Rolio Job Search Complete', {
+                  body: `Found ${resultsData.matches?.length || 0} matching jobs!`,
+                  icon: '/favicon.svg',
+                })
+              }
             } catch (error) {
               console.error('Failed to fetch results:', error)
-            }
-
-            // Show notification
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('Rolio Job Search Complete', {
-                body: `Found ${resultsData.matches?.length || 0} matching jobs!`,
-                icon: '/favicon.svg',
-              })
             }
           }
         }
