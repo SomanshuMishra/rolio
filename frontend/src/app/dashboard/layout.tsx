@@ -6,6 +6,7 @@ import Navbar from '@/components/dashboard/Navbar'
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import HolographicGrid from '@/components/ui/HolographicGrid'
 
 function DashboardContent({
   children,
@@ -39,7 +40,7 @@ function DashboardContent({
 
       {/* Main content */}
       <motion.main
-        className="pt-0 min-h-screen transition-all duration-300 bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7]"
+        className="pt-0 min-h-screen transition-all duration-300 bg-[#030712] relative"
         style={{
           marginLeft: isMobile ? 0 : (isCollapsed ? 68 : 260),
         }}
@@ -47,7 +48,10 @@ function DashboardContent({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        {children}
+        <HolographicGrid />
+        <div className="relative z-10">
+          {children}
+        </div>
       </motion.main>
     </>
   )
@@ -109,18 +113,19 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="w-full h-screen bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7] flex items-center justify-center">
+      <div className="w-full h-screen bg-[#030712] flex items-center justify-center relative">
+        <HolographicGrid />
         <motion.div
-          className="flex flex-col items-center gap-4"
+          className="flex flex-col items-center gap-4 relative z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           <motion.div
-            className="w-12 h-12 border-3 border-pink-300 border-t-purple-400 rounded-full"
+            className="w-12 h-12 border-3 border-cyan-500 border-t-purple-500 rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity }}
           />
-          <p className="text-purple-600 font-medium">Loading dashboard...</p>
+          <p className="text-cyan-400 font-medium">Loading dashboard...</p>
         </motion.div>
       </div>
     )
@@ -132,7 +137,7 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="bg-gradient-to-br from-[#faf8f3] via-[#f7f3ff] to-[#f0f9f7] text-[#4a4a5e] min-h-screen">
+      <div className="bg-[#030712] text-slate-300 min-h-screen">
         <DashboardContent userName={userName} userEmail={userEmail}>
           {children}
         </DashboardContent>

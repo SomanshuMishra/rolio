@@ -40,11 +40,16 @@ const config: Config = {
       },
       animation: {
         shimmer: 'shimmer 2s infinite',
+        'float': 'float 4s ease-in-out infinite',
       },
       keyframes: {
         shimmer: {
           '0%': { backgroundPosition: '-1000px 0' },
           '100%': { backgroundPosition: '1000px 0' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)', opacity: '0.3' },
+          '50%': { transform: 'translateY(-20px)', opacity: '0.5' },
         },
       },
     },

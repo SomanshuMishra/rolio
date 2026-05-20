@@ -125,25 +125,30 @@ export default function ResumePage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="min-h-screen p-4 md:p-8 relative">
       {/* Header */}
       <motion.div
-        className="mb-12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
+        className="mb-8 md:mb-12"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, type: 'spring' }}
       >
-        <h1 className="text-4xl font-bold mb-2 ai-text">Your Resume</h1>
-        <p className="text-slate-400">Upload and manage your resume for job matching</p>
+        <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 ai-text">Your Resume</h1>
+        <p className="text-sm md:text-base text-slate-400">Upload and manage your resume for job matching</p>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         {/* Upload Section */}
-        <div className="lg:col-span-1">
+        <motion.div
+          className="lg:col-span-1"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           <motion.div
-            className={`border-2 border-dashed rounded-xl p-8 transition-all duration-300 cyber-glass ${
+            className={`border-2 border-dashed rounded-xl p-6 md:p-8 transition-all duration-300 cyber-glass relative overflow-hidden group ${
               isDragging
-                ? 'border-cyan-500 border-opacity-100'
+                ? 'border-cyan-500 border-opacity-100 shadow-[0_0_30px_rgba(6,182,212,0.3)]'
                 : 'border-cyan-500/40 border-opacity-50'
             }`}
             onDragOver={handleDragOver}
@@ -151,16 +156,19 @@ export default function ResumePage() {
             onDrop={handleDrop}
             whileHover={{ scale: 1.02 }}
           >
-            <div className="text-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/5 group-hover:to-cyan-500/5 transition-all duration-300" />
+
+            <div className="text-center relative z-10">
               <motion.div
-                className="text-5xl mb-4"
-                animate={isDragging ? { scale: 1.2, rotate: 10 } : { scale: 1, rotate: 0 }}
+                className="text-5xl md:text-6xl mb-4"
+                animate={isDragging ? { scale: 1.2, rotate: 12, y: -10 } : { scale: 1, rotate: 0, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300 }}
               >
                 📄
               </motion.div>
 
-              <h3 className="text-lg font-semibold mb-2 text-cyan-300">Drop your resume here</h3>
-              <p className="text-slate-400 text-sm mb-4">or click to browse</p>
+              <h3 className="text-lg md:text-xl font-semibold mb-2 text-cyan-300">Drop your resume here</h3>
+              <p className="text-xs md:text-sm text-slate-400 mb-4">or click to browse</p>
 
               <input
                 ref={fileInputRef}
@@ -173,9 +181,9 @@ export default function ResumePage() {
               <motion.button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="px-4 py-2 bg-gradient-to-r from-cyan-500/40 to-purple-500/40 hover:from-cyan-500/60 hover:to-purple-500/60 rounded-lg text-sm font-medium text-cyan-300 disabled:opacity-50 transition-all border border-cyan-500/50 neon-glow-cyan"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500/40 to-purple-500/40 hover:from-cyan-500/60 hover:to-purple-500/60 rounded-lg text-xs md:text-sm font-medium text-cyan-300 disabled:opacity-50 transition-all border border-cyan-500/50 neon-glow-cyan"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
               >
                 {isUploading ? 'Uploading...' : 'Choose File'}
               </motion.button>
@@ -212,7 +220,7 @@ export default function ResumePage() {
             <AnimatePresence>
               {uploadError && (
                 <motion.div
-                  className="mt-4 pt-4 border-t border-red-500/20 text-red-400 text-sm"
+                  className="mt-4 pt-4 border-t border-red-500/20 text-red-400 text-xs md:text-sm"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -222,20 +230,25 @@ export default function ResumePage() {
               )}
             </AnimatePresence>
           </motion.div>
-        </div>
+        </motion.div>
 
         {/* Preview Section */}
         {(parsedData || isScanActive) && (
           <motion.div
             className="lg:col-span-2 relative"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0, x: 20, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ duration: 0.5, type: 'spring' }}
             ref={previewRef}
           >
             <ScanBeam isActive={isScanActive} onComplete={() => setIsScanActive(false)} />
-            <div className="cyber-glass border border-cyan-500/30 rounded-xl p-8 relative">
-              <h2 className="text-2xl font-semibold mb-6 text-cyan-300">Parsed Resume Data</h2>
+            <motion.div
+              className="cyber-glass border border-cyan-500/30 rounded-xl p-6 md:p-8 relative overflow-hidden group"
+              whileHover={{ borderColor: 'rgba(6, 182, 212, 0.5)' }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-purple-500/0 group-hover:from-cyan-500/10 group-hover:to-purple-500/10 transition-all duration-300" />
+              <div className="relative z-10">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-cyan-300">Parsed Resume Data</h2>
 
               {/* Basic Info */}
               {parsedData && parsedData.name && (
@@ -324,31 +337,32 @@ export default function ResumePage() {
                 </motion.div>
               )}
 
-              {parsedData && (
-                <motion.button
-                  onClick={handleConfirmResume}
-                  disabled={isConfirming}
-                  className="w-full mt-6 py-2 px-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden neon-glow-cyan"
-                  whileHover={{ scale: isConfirming ? 1 : 1.02 }}
-                  whileTap={{ scale: isConfirming ? 1 : 0.98 }}
-                >
-                  <motion.span
-                    animate={{ opacity: isConfirming ? 0 : 1 }}
-                    transition={{ duration: 0.2 }}
+                {parsedData && (
+                  <motion.button
+                    onClick={handleConfirmResume}
+                    disabled={isConfirming}
+                    className="w-full mt-6 py-2 px-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg text-xs md:text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden neon-glow-cyan"
+                    whileHover={{ scale: isConfirming ? 1 : 1.05 }}
+                    whileTap={{ scale: isConfirming ? 1 : 0.95 }}
                   >
-                    ✓ Confirm Resume
-                  </motion.span>
-                  {isConfirming && (
-                    <motion.div
-                      className="absolute inset-0 flex items-center justify-center"
-                      animate={{ opacity: 1 }}
+                    <motion.span
+                      animate={{ opacity: isConfirming ? 0 : 1 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    </motion.div>
-                  )}
-                </motion.button>
-              )}
-            </div>
+                      ✓ Confirm Resume
+                    </motion.span>
+                    {isConfirming && (
+                      <motion.div
+                        className="absolute inset-0 flex items-center justify-center"
+                        animate={{ opacity: 1 }}
+                      >
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      </motion.div>
+                    )}
+                  </motion.button>
+                )}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </div>
