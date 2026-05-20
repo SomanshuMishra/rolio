@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
 import * as XLSX from 'xlsx'
-import AIAssistantOrb from '@/components/ai/AIAssistantOrb'
 import PremiumAIBackground from '@/components/ui/PremiumAIBackground'
 import PremiumAIOrb from '@/components/ui/PremiumAIOrb'
 import PremiumSearchBar from '@/components/ui/PremiumSearchBar'
@@ -335,23 +334,11 @@ export default function JobsPage() {
       />
 
       {/* Main Content */}
-      <div className="relative z-10 p-4 md:p-6 lg:p-8">
-      {/* AI Assistant Orb */}
-      <AIAssistantOrb
-        isThinking={searchInProgress && searchStatus?.status === 'pending'}
-        isSearching={searchInProgress && searchStatus?.status === 'in_progress'}
-        isSuccess={isSuccess}
-        matchCount={searchResults.length}
-        onClick={handleStartSearch}
-        size={typeof window !== 'undefined' && window.innerWidth < 768 ? 56 : 80}
-        position="bottom-right"
-      />
-
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="max-w-7xl mx-auto"
+        className="relative z-10 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto"
       >
         {/* Hero Section */}
         <div className="mb-8 md:mb-12 text-center">

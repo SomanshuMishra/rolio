@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 interface PremiumSearchBarProps {
   onSearch: (value: string) => void
@@ -16,11 +16,17 @@ export default function PremiumSearchBar({
 }: PremiumSearchBarProps) {
   const [value, setValue] = useState('')
   const [isFocused, setIsFocused] = useState(false)
+  const isSubmittingRef = useRef(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (value.trim()) {
+    if (value.trim() && !isSubmittingRef.current && !isSearching) {
+      isSubmittingRef.current = true
       onSearch(value)
+      // Reset flag after search starts
+      setTimeout(() => {
+        isSubmittingRef.current = false
+      }, 100)
     }
   }
 

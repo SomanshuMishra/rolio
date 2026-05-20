@@ -6,10 +6,9 @@ import gsap from 'gsap'
 interface ScanBeamProps {
   isActive: boolean
   onComplete?: () => void
-  height?: string
 }
 
-export default function ScanBeam({ isActive, onComplete, height = '100%' }: ScanBeamProps) {
+export default function ScanBeam({ isActive, onComplete }: ScanBeamProps) {
   const beamRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
 

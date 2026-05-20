@@ -9,13 +9,19 @@ interface PremiumAIOrbProps {
 }
 
 export default function PremiumAIOrb({ state, onClick }: PremiumAIOrbProps) {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [orbPos, setOrbPos] = useState({ x: 0, y: 0 })
   const orbRef = useRef<HTMLDivElement>(null)
+  const posRef = useRef({ x: 0, y: 0 })
+  const lastUpdateRef = useRef(0)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!orbRef.current) return
+
+      const now = Date.now()
+      if (now - lastUpdateRef.current < 32) return // ~30fps for mouse tracking
+      lastUpdateRef.current = now
+
       const rect = orbRef.current.getBoundingClientRect()
       const orbCenterX = rect.left + rect.width / 2
       const orbCenterY = rect.top + rect.height / 2
@@ -28,14 +34,18 @@ export default function PremiumAIOrb({ state, onClick }: PremiumAIOrbProps) {
       if (distance < maxDistance) {
         const angle = Math.atan2(dy, dx)
         const moveDistance = (1 - distance / maxDistance) * 20
-        setOrbPos({
+        posRef.current = {
           x: Math.cos(angle) * moveDistance,
           y: Math.sin(angle) * moveDistance,
-        })
+        }
+        setOrbPos(posRef.current)
+      } else if (posRef.current.x !== 0 || posRef.current.y !== 0) {
+        posRef.current = { x: 0, y: 0 }
+        setOrbPos({ x: 0, y: 0 })
       }
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 

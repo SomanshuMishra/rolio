@@ -104,13 +104,13 @@ export default function Sidebar() {
 
   return (
     <motion.aside
-      className="fixed left-0 top-0 h-screen bg-gradient-to-b from-white via-white/98 to-pink-50/80 border-r border-pink-100/50 backdrop-blur-sm z-40"
+      className="fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-900/95 via-slate-900/90 to-slate-800/95 border-r border-cyan-500/20 backdrop-blur-sm z-40"
       animate={{ width: isCollapsed ? 68 : 260 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
       {/* Logo Section */}
       <motion.div
-        className="p-4 border-b border-pink-100/50 h-20 flex items-center justify-between bg-gradient-to-r from-white/80 via-pink-50/50 to-white/80"
+        className="p-4 border-b border-cyan-500/20 h-20 flex items-center justify-between bg-gradient-to-r from-slate-900/80 via-slate-800/50 to-slate-900/80"
         layout
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -133,20 +133,20 @@ export default function Sidebar() {
 
         <motion.button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-purple-100 transition-colors flex-shrink-0"
+          className="p-1.5 rounded-lg hover:bg-cyan-500/20 transition-colors flex-shrink-0"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
           {isCollapsed ? (
-            <ChevronRight size={18} className="text-purple-500" />
+            <ChevronRight size={18} className="text-cyan-400" />
           ) : (
-            <ChevronLeft size={18} className="text-purple-500" />
+            <ChevronLeft size={18} className="text-cyan-400" />
           )}
         </motion.button>
       </motion.div>
 
       {/* Navigation Sections */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 bg-gradient-to-b from-transparent via-white/20 to-pink-50/30">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 bg-gradient-to-b from-transparent via-slate-800/20 to-slate-800/30">
         {NAVIGATION_SECTIONS.map((section, sectionIdx) => (
           <motion.div key={section.label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: sectionIdx * 0.1 }}>
             <AnimatePresence mode="wait">
@@ -157,7 +157,7 @@ export default function Sidebar() {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-purple-400 mb-3 px-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-cyan-400 mb-3 px-3">
                     {section.label}
                   </p>
                 </motion.div>
@@ -180,8 +180,8 @@ export default function Sidebar() {
                       <motion.div
                         className={`relative px-3 py-2.5 rounded-lg cursor-pointer flex items-center gap-3 transition-all duration-200 group ${
                           isActive
-                            ? `${item.color} shadow-md text-white`
-                            : 'bg-white/40 hover:bg-white/60 text-gray-700 hover:text-gray-900'
+                            ? 'bg-cyan-500/20 border border-cyan-500/50 shadow-md text-cyan-300'
+                            : 'bg-slate-700/40 hover:bg-slate-700/60 text-slate-400 hover:text-slate-300'
                         }`}
                         whileTap={{ scale: 0.96 }}
                       >
@@ -190,7 +190,7 @@ export default function Sidebar() {
                           <Icon
                             size={20}
                             className={`transition-colors duration-200 ${
-                              isActive ? 'text-white' : 'text-gray-600 group-hover:text-gray-900'
+                              isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-400'
                             }`}
                           />
                         </div>
@@ -207,7 +207,7 @@ export default function Sidebar() {
                             >
                               <span
                                 className={`text-sm font-medium truncate transition-colors duration-200 ${
-                                  isActive ? 'text-white' : 'text-gray-700'
+                                  isActive ? 'text-cyan-300' : 'text-slate-400'
                                 }`}
                               >
                                 {item.name}

@@ -6,7 +6,6 @@ interface GlowCardProps {
   children: ReactNode
   className?: string
   glowColor?: 'cyan' | 'purple' | 'pink'
-  borderAccent?: boolean
   leftBorder?: boolean
 }
 
@@ -14,7 +13,6 @@ export default function GlowCard({
   children,
   className = '',
   glowColor = 'cyan',
-  borderAccent = false,
   leftBorder = false,
 }: GlowCardProps) {
   const glowColorMap = {
