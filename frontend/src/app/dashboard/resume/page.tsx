@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/Toast'
 import ScanBeam from '@/components/ui/ScanBeam'
@@ -28,8 +28,36 @@ export default function ResumePage() {
   const [uploadError, setUploadError] = useState('')
   const [isConfirming, setIsConfirming] = useState(false)
   const [isScanActive, setIsScanActive] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const previewRef = useRef<HTMLDivElement>(null)
+
+  // Load existing resume on mount
+  useEffect(() => {
+    const loadResume = async () => {
+      try {
+        const token = localStorage.getItem('access_token')
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+        const response = await fetch(`${apiUrl}/api/resume/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.parsed_data) {
+            setParsedData(data.parsed_data)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load resume:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadResume()
+  }, [])
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -233,7 +261,7 @@ export default function ResumePage() {
         </motion.div>
 
         {/* Preview Section */}
-        {(parsedData || isScanActive) && (
+        {!isLoading && (parsedData || isScanActive) && (
           <motion.div
             className="lg:col-span-2 relative"
             initial={{ opacity: 0, x: 20, scale: 0.95 }}
