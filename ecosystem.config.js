@@ -2,14 +2,9 @@ module.exports = {
   apps: [
     {
       name: 'rolio-backend',
-      cwd: '/home/ubuntu/rolio/backend',
-      script: '/home/ubuntu/rolio/backend/venv/bin/uvicorn',
-      args: 'app.main:app --host 0.0.0.0 --port 8000 --workers 4',
+      script: '/home/ubuntu/rolio/start-backend.sh',
       max_memory_restart: '1G',
       restart_delay: 3000,
-      env: {
-        PYTHONPATH: '/home/ubuntu/rolio/backend',
-      },
     },
     {
       name: 'rolio-frontend',
