@@ -3,9 +3,8 @@ module.exports = {
     {
       name: 'rolio-backend',
       cwd: '/home/ubuntu/rolio/backend',
-      interpreter: '/home/ubuntu/rolio/backend/venv/bin/python',
-      script: '-m',
-      args: 'uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4',
+      script: '/home/ubuntu/rolio/backend/venv/bin/uvicorn',
+      args: 'app.main:app --host 0.0.0.0 --port 8000 --workers 4',
       max_memory_restart: '1G',
       restart_delay: 3000,
       env: {
