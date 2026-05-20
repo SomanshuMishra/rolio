@@ -6,6 +6,9 @@ import { useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import AIAssistantOrb from '@/components/ai/AIAssistantOrb'
+import PremiumAIBackground from '@/components/ui/PremiumAIBackground'
+import PremiumAIOrb from '@/components/ui/PremiumAIOrb'
+import PremiumSearchBar from '@/components/ui/PremiumSearchBar'
 
 const MIN_MATCH_SCORE = 60
 
@@ -267,23 +270,27 @@ export default function JobsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#030712] flex items-center justify-center relative">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
+        <PremiumAIBackground />
         <motion.div
+          className="relative z-10"
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="w-12 h-12 border-3 border-cyan-500 border-t-purple-500 rounded-full"
-        />
+        >
+          <div className="w-12 h-12 border-3 border-cyan-500 border-t-purple-500 rounded-full" />
+        </motion.div>
       </div>
     )
   }
 
   if (!hasResume) {
     return (
-      <div className="min-h-screen bg-[#030712] flex items-center justify-center relative p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative p-4 overflow-hidden">
+        <PremiumAIBackground />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center cyber-glass border border-cyan-500/30 rounded-xl p-8 md:p-12 max-w-md"
+          className="text-center cyber-glass border border-cyan-500/30 rounded-xl p-8 md:p-12 max-w-md relative z-10"
         >
           <motion.p
             className="text-3xl md:text-4xl mb-4"
@@ -309,7 +316,26 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="min-h-screen text-slate-300 p-4 md:p-6 lg:p-8 relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-300 relative overflow-hidden">
+      {/* Premium AI Background */}
+      <PremiumAIBackground />
+
+      {/* Premium AI Orb */}
+      <PremiumAIOrb
+        state={
+          searchInProgress && searchStatus?.status === 'pending'
+            ? 'thinking'
+            : searchInProgress && searchStatus?.status === 'in_progress'
+            ? 'searching'
+            : isSuccess
+            ? 'success'
+            : 'idle'
+        }
+        onClick={handleStartSearch}
+      />
+
+      {/* Main Content */}
+      <div className="relative z-10 p-4 md:p-6 lg:p-8">
       {/* AI Assistant Orb */}
       <AIAssistantOrb
         isThinking={searchInProgress && searchStatus?.status === 'pending'}
@@ -324,60 +350,73 @@ export default function JobsPage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-7xl mx-auto"
       >
         {/* Hero Section */}
-        <div className="mb-8 md:mb-12">
+        <div className="mb-8 md:mb-12 text-center">
           <motion.h1
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 ai-text"
+            transition={{ delay: 0.2 }}
+            className="text-4xl md:text-6xl lg:text-7xl font-black mb-3 ai-text"
           >
-            Job Opportunities
+            Opportunities Await
           </motion.h1>
-          <p className="text-sm md:text-base lg:text-lg text-slate-400">AI-matched roles tailored to your profile</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-sm md:text-lg text-slate-400 mb-8"
+          >
+            AI is scanning the universe for your perfect role
+          </motion.p>
+
+          {/* Premium Search Bar */}
+          <PremiumSearchBar onSearch={handleStartSearch} isSearching={searchInProgress} />
         </div>
 
         {/* Accumulating Jobs Message */}
         <AnimatePresence>
           {searchInProgress && searchStatus?.status === 'pending' && (
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mb-8 cyber-glass border border-cyan-500/50 rounded-2xl p-8 md:p-10 text-center"
+              exit={{ opacity: 0, y: -30 }}
+              className="mb-12 mt-12 max-w-2xl mx-auto"
             >
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center"
-              >
-                <span className="text-2xl">✨</span>
-              </motion.div>
-              <h2 className="text-xl md:text-2xl font-bold text-cyan-300 mb-2">Accumulating Jobs for You</h2>
-              <p className="text-slate-400 text-sm md:text-base">Searching multiple sources and matching with your profile...</p>
+              <div className="bg-gradient-to-br from-slate-800/50 via-slate-800/50 to-slate-900/50 backdrop-blur-xl border border-cyan-500/40 rounded-2xl p-8 md:p-12 text-center relative overflow-hidden">
+                {/* Animated Background Glow */}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl"
+                  animate={{
+                    background: [
+                      'radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.1) 0%, transparent 50%)',
+                      'radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)',
+                      'radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.1) 0%, transparent 50%)',
+                    ],
+                  }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  style={{ pointerEvents: 'none' }}
+                />
+
+                <motion.div
+                  className="relative z-10 w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-500/30 to-purple-500/30 border border-cyan-500/50 flex items-center justify-center"
+                  animate={{ scale: [1, 1.2, 1], rotate: 360 }}
+                  transition={{ scale: { duration: 2, repeat: Infinity }, rotate: { duration: 3, repeat: Infinity, ease: 'linear' } }}
+                >
+                  <span className="text-3xl">⚡</span>
+                </motion.div>
+                <h2 className="relative z-10 text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent mb-3">
+                  Discovering Opportunities
+                </h2>
+                <p className="relative z-10 text-slate-400 text-sm md:text-base">
+                  AI is analyzing thousands of roles and finding your perfect matches...
+                </p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Action Section */}
-        {!searchInProgress && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
-            <motion.button
-              onClick={handleStartSearch}
-              disabled={searchInProgress}
-              className="w-full md:w-auto px-6 md:px-8 py-3 md:py-5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white rounded-2xl font-bold text-base md:text-lg flex items-center justify-center gap-3 neon-glow-cyan transition-all disabled:opacity-50"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span className="text-xl md:text-2xl">🔍</span> Find Jobs Now
-            </motion.button>
-          </motion.div>
-        )}
 
         {/* Status Cards Section */}
         <AnimatePresence>
