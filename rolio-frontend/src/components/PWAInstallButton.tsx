@@ -93,33 +93,15 @@ export default function PWAInstallButton() {
     setIsVisible(false)
   }
 
-  // DEBUG: Show state overlay (always render for debugging)
-  const debugOverlay = (
-    <div className="fixed top-4 right-4 z-[9999] bg-black/80 text-white text-xs p-3 rounded max-w-xs font-mono pointer-events-none">
-      <div className="font-bold mb-2">PWA Debug</div>
-      <div>Mounted: {mounted ? '✓' : '✗'}</div>
-      <div>iOS: {isIOS ? '✓' : '✗'}</div>
-      <div>Visible: {isVisible ? '✓' : '✗'}</div>
-      <div>Installed: {isInstalled ? '✓' : '✗'}</div>
-      <div className="mt-2 text-[10px] break-words">UA: {typeof window !== 'undefined' ? window.navigator.userAgent.substring(0, 50) : 'N/A'}...</div>
-    </div>
-  )
-
   // Avoid SSR/hydration flash; state is set in useEffect on the client
-  if (!mounted) {
-    return debugOverlay
-  }
-
-  if (isInstalled) {
-    return debugOverlay
+  if (!mounted || isInstalled) {
+    return null
   }
 
   // iOS manual install prompt
   if (isIOS) {
     return (
-      <>
-        {debugOverlay}
-        <AnimatePresence>
+      <AnimatePresence>
           {isVisible && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -145,15 +127,12 @@ export default function PWAInstallButton() {
             </motion.div>
           )}
         </AnimatePresence>
-      </>
     )
   }
 
   // Android/Web install button
   return (
-    <>
-      {debugOverlay}
-      <AnimatePresence>
+    <AnimatePresence>
         {isVisible && deferredPrompt && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -186,6 +165,6 @@ export default function PWAInstallButton() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    )
   )
 }

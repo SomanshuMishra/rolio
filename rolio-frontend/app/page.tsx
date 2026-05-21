@@ -6,12 +6,10 @@ import Stats from "@/components/landing/stats"
 import Testimonials from "@/components/landing/testimonials"
 import CTA from "@/components/landing/cta"
 import Footer from "@/components/landing/footer"
-import PWADebug from "@/src/components/PWADebug"
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
-      <PWADebug />
       <Navbar />
       <Hero />
       <Features />
