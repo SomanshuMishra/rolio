@@ -115,6 +115,9 @@ export const authAPI = {
   login: (data: { email: string; password: string }) =>
     api.post('/api/auth/login', data),
 
+  googleSignIn: (idToken: string) =>
+    api.post('/api/auth/google', { id_token: idToken }),
+
   logout: (refreshToken: string) =>
     api.post('/api/auth/logout', { refresh_token: refreshToken }),
 
@@ -179,8 +182,10 @@ export const jobsAPI = {
 export const profileAPI = {
   get: () => api.get('/api/profile'),
 
-  update: (data: { full_name?: string; avatar_url?: string | null }) =>
+  update: (data: { full_name?: string; avatar_url?: string | null; phone_number?: string }) =>
     api.put('/api/profile', data),
+
+  completeOnboarding: () => api.post('/api/profile/complete-onboarding'),
 
   getApiKeys: () => api.get('/api/profile/api-keys'),
 

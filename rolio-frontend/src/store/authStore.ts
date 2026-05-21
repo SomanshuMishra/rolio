@@ -7,6 +7,8 @@ export interface User {
   email: string
   full_name: string
   avatar_url: string | null
+  phone_number: string | null
+  is_onboarding_complete: boolean
   created_at: string
   is_active: boolean
 }
@@ -22,8 +24,10 @@ interface AuthState {
 
   register: (email: string, password: string, fullName: string) => Promise<void>
   login: (email: string, password: string) => Promise<void>
+  loginWithGoogle: (idToken: string) => Promise<void>
   logout: () => Promise<void>
   setUser: (user: User) => void
+  markOnboardingComplete: () => Promise<void>
   clearAuth: () => void
 }
 
@@ -121,6 +125,39 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      loginWithGoogle: async (idToken: string) => {
+        try {
+          set({ isLoading: true, error: null })
+          const response = await authAPI.googleSignIn(idToken)
+
+          const { user, access_token, refresh_token } = response.data
+
+          // Store tokens
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              'rolio_tokens',
+              JSON.stringify({
+                accessToken: access_token,
+                refreshToken: refresh_token,
+              })
+            )
+          }
+
+          // Update state
+          set({
+            user,
+            accessToken: access_token,
+            refreshToken: refresh_token,
+            isAuthenticated: true,
+            isLoading: false,
+          })
+        } catch (err: any) {
+          const errorMsg = err.response?.data?.detail || 'Google sign-in failed'
+          set({ error: errorMsg, isLoading: false })
+          throw err
+        }
+      },
+
       logout: async () => {
         try {
           const { refreshToken } = get()
@@ -144,6 +181,24 @@ export const useAuthStore = create<AuthState>()(
 
       setUser: (user: User) => {
         set({ user })
+      },
+
+      markOnboardingComplete: async () => {
+        try {
+          set({ isLoading: true, error: null })
+          const { profileAPI } = await import('@/lib/api')
+          const response = await profileAPI.completeOnboarding()
+          const userData = response.data.user
+
+          set({
+            user: userData,
+            isLoading: false,
+          })
+        } catch (err: any) {
+          console.error('Failed to mark onboarding complete:', err)
+          set({ isLoading: false })
+          throw err
+        }
       },
 
       clearAuth: () => {
