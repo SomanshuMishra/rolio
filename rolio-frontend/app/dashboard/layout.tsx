@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import OnboardingOverlay from "@/src/components/onboarding/OnboardingOverlay"
 
 const sidebarLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -311,6 +312,9 @@ export default function DashboardLayout({
         {/* Page Content */}
         <div className="p-4 lg:p-6">{children}</div>
       </main>
+
+      {/* Onboarding Overlay */}
+      {user && !user.is_onboarding_complete && <OnboardingOverlay />}
 
       {/* Mobile Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 glass border-t border-glass-border lg:hidden">
