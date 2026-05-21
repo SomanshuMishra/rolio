@@ -223,40 +223,51 @@ export default function DashboardLayout({
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="fixed inset-x-0 top-16 z-30 glass border-b border-glass-border lg:hidden"
-          >
-            <nav className="p-4">
-              {sidebarLinks.map((link) => {
-                const Icon = link.icon
-                const isActive = pathname === link.href
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 rounded-lg px-4 py-3 min-h-[44px] ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-foreground hover:bg-white/10"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{link.label}</span>
-                  </Link>
-                )
-              })}
-              <div className="mt-4 border-t border-border pt-4">
-                <button className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-destructive hover:bg-white/10">
-                  <LogOut className="h-5 w-5" />
-                  <span className="font-medium">Sign Out</span>
-                </button>
-              </div>
-            </nav>
-          </motion.div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 top-16 z-40 bg-black/50 lg:hidden"
+            />
+            {/* Menu */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="fixed inset-x-0 top-16 z-50 glass border-b border-glass-border lg:hidden max-h-[calc(100vh-64px)] overflow-y-auto"
+            >
+              <nav className="p-4">
+                {sidebarLinks.map((link) => {
+                  const Icon = link.icon
+                  const isActive = pathname === link.href
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 rounded-lg px-4 py-3 min-h-[44px] ${
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground hover:bg-white/10"
+                      }`}
+                    >
+                      <Icon className="h-5 w-5 flex-shrink-0" />
+                      <span className="font-medium text-sm sm:text-base">{link.label}</span>
+                    </Link>
+                  )
+                })}
+                <div className="mt-4 border-t border-border pt-4">
+                  <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-destructive hover:bg-white/10">
+                    <LogOut className="h-5 w-5" />
+                    <span className="font-medium">Sign Out</span>
+                  </button>
+                </div>
+              </nav>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
