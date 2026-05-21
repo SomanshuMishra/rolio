@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import RQProvider from '@/src/providers/QueryProvider'
+import PWASetup from '@/src/components/PWASetup'
 import './globals.css'
 
 const geist = Geist({ 
@@ -24,6 +25,15 @@ export const metadata: Metadata = {
   generator: 'ROLIO',
   keywords: ['AI jobs', 'career', 'resume', 'job matching', 'AI career', 'job search'],
   authors: [{ name: 'ROLIO' }],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'ROLIO',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   openGraph: {
     title: 'ROLIO - AI-Powered Career Operating System',
     description: 'The future of getting jobs. AI-powered job matching, resume optimization, and career guidance.',
@@ -64,6 +74,7 @@ export default function RootLayout({
       <body className={`${geist.variable} ${geistMono.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <RQProvider>
+            <PWASetup />
             {children}
             {process.env.NODE_ENV === 'production' && <Analytics />}
           </RQProvider>

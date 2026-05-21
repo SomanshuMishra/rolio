@@ -69,7 +69,8 @@
       "Read(//tmp/**)",
       "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
       "Bash(cd *)",
-      "Bash(node -c app/dashboard/resume/page.tsx)"
+      "Bash(node -c app/dashboard/resume/page.tsx)",
+      "Bash(grep -E \"\\\\.\\(md\\)$\")"
     ]
   }
 }
