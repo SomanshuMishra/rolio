@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
 
+    # Firebase (for Google Sign-In)
+    FIREBASE_PROJECT_ID: str = ""
+    FIREBASE_SERVICE_ACCOUNT_KEY: str = ""  # JSON string of service account credentials
+    ALLOW_GOOGLE_AUTO_SIGNUP: bool = True
+
     class Config:
         env_file = ".env"
         case_sensitive = True

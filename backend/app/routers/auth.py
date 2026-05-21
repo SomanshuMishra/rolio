@@ -14,6 +14,7 @@ from ..schemas.auth import (
     UserResponse,
     RefreshTokenRequest,
     LogoutResponse,
+    GoogleSignInRequest,
 )
 from ..utils.security import (
     hash_password,
@@ -22,6 +23,7 @@ from ..utils.security import (
     create_refresh_token,
     decode_token,
 )
+from ..utils.firebase import verify_firebase_token, get_or_create_user_from_firebase_token
 from ..config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -210,3 +212,50 @@ def logout(request: RefreshTokenRequest, db: Session = Depends(get_db)):
         db.commit()
 
     return LogoutResponse(message="Successfully logged out")
+
+
+@router.post("/google", response_model=AuthResponse, status_code=status.HTTP_200_OK)
+def google_signin(request: GoogleSignInRequest, db: Session = Depends(get_db)):
+    """Sign in with Google Firebase ID token."""
+    try:
+        # Verify Firebase ID token
+        decoded_token = verify_firebase_token(request.id_token)
+
+        # Get or create user from token
+        user = get_or_create_user_from_firebase_token(decoded_token, db)
+
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User account is disabled",
+            )
+
+        # Generate JWT tokens
+        token_data = {"sub": str(user.id), "email": user.email}
+        access_token = create_access_token(token_data)
+        refresh_token = create_refresh_token(token_data)
+
+        # Store refresh token hash
+        token_hash = hashlib.sha256(refresh_token.encode()).hexdigest()
+        expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        rt = RefreshToken(
+            user_id=user.id,
+            token_hash=token_hash,
+            expires_at=expires_at,
+        )
+        db.add(rt)
+        db.commit()
+
+        return AuthResponse(
+            user=UserResponse.from_orm(user),
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Google sign-in failed: {str(e)}",
+        )
