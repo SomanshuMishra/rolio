@@ -130,24 +130,15 @@ function JobCard({ job, onMutate, refetch }: { job: JobMatch; onMutate?: () => v
     },
   })
 
-  // Apply mutation
-  const { mutate: applyJob, isPending: isApplyPending } = useMutation({
-    mutationFn: () => jobsAPI.applyJob(job.jsearch_id),
-    onSuccess: (response: any) => {
-      toast.success("Application submitted!")
-      // Try to get apply_url from response, fallback to job object
-      const applyUrl = response?.data?.apply_url || job.apply_url
-      if (applyUrl) {
-        window.open(applyUrl, "_blank")
-      } else {
-        toast.info("Job link not available, check your applications")
-      }
-      refetch()
-    },
-    onError: () => {
-      toast.error("Failed to apply to job")
-    },
-  })
+  // Handle direct apply - opens job URL in new tab
+  const handleQuickApply = () => {
+    if (job.apply_url) {
+      window.open(job.apply_url, "_blank")
+      toast.success("Opening job application in new tab")
+    } else {
+      toast.error("Apply link not available for this job")
+    }
+  }
 
   return (
     <motion.div
@@ -247,21 +238,14 @@ function JobCard({ job, onMutate, refetch }: { job: JobMatch; onMutate?: () => v
         {/* Actions */}
         <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <Button
-            onClick={() => applyJob()}
-            disabled={isApplyPending}
+            onClick={handleQuickApply}
+            disabled={!job.apply_url}
             className="flex-1 h-11 sm:h-auto bg-primary text-primary-foreground hover:bg-primary/90 text-sm sm:text-base"
           >
-            {isApplyPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Applying...
-              </>
-            ) : (
-              <>
-                Quick Apply
-                <Sparkles className="ml-2 h-3 sm:h-4 w-3 sm:w-4" />
-              </>
-            )}
+            <>
+              Quick Apply
+              <ExternalLink className="ml-2 h-3 sm:h-4 w-3 sm:w-4" />
+            </>
           </Button>
           <div className="flex gap-2 sm:gap-3">
             <Button
