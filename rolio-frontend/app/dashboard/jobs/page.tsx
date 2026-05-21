@@ -135,9 +135,12 @@ function JobCard({ job, onMutate, refetch }: { job: JobMatch; onMutate?: () => v
     mutationFn: () => jobsAPI.applyJob(job.jsearch_id),
     onSuccess: (response: any) => {
       toast.success("Application submitted!")
-      const applyUrl = response?.data?.apply_url
+      // Try to get apply_url from response, fallback to job object
+      const applyUrl = response?.data?.apply_url || job.apply_url
       if (applyUrl) {
         window.open(applyUrl, "_blank")
+      } else {
+        toast.info("Job link not available, check your applications")
       }
       refetch()
     },
