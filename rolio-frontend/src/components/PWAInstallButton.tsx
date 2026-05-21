@@ -93,21 +93,22 @@ export default function PWAInstallButton() {
     setIsVisible(false)
   }
 
-  // Avoid SSR/hydration flash; state is set in useEffect on the client
-  if (!mounted) {
-    return null
-  }
-
-  // DEBUG: Show state overlay
+  // DEBUG: Show state overlay (always render for debugging)
   const debugOverlay = (
-    <div className="fixed top-4 right-4 z-[999] bg-black/80 text-white text-xs p-3 rounded max-w-xs font-mono">
+    <div className="fixed top-4 right-4 z-[9999] bg-black/80 text-white text-xs p-3 rounded max-w-xs font-mono pointer-events-none">
       <div className="font-bold mb-2">PWA Debug</div>
+      <div>Mounted: {mounted ? '✓' : '✗'}</div>
       <div>iOS: {isIOS ? '✓' : '✗'}</div>
       <div>Visible: {isVisible ? '✓' : '✗'}</div>
       <div>Installed: {isInstalled ? '✓' : '✗'}</div>
       <div className="mt-2 text-[10px] break-words">UA: {typeof window !== 'undefined' ? window.navigator.userAgent.substring(0, 50) : 'N/A'}...</div>
     </div>
   )
+
+  // Avoid SSR/hydration flash; state is set in useEffect on the client
+  if (!mounted) {
+    return debugOverlay
+  }
 
   if (isInstalled) {
     return debugOverlay
