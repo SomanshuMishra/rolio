@@ -15,7 +15,9 @@ export default function PWAInstallButton() {
   const [isIOS, setIsIOS] = useState(() => {
     if (typeof window === 'undefined') return false
     const ua = window.navigator.userAgent
-    return /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream
+    const detected = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream
+    console.log('[PWAInstallButton] iOS Detection:', { ua, detected })
+    return detected
   })
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
@@ -76,11 +78,15 @@ export default function PWAInstallButton() {
 
   // If app is already installed, don't show button
   if (isInstalled) {
+    console.log('[PWAInstallButton] App already installed')
     return null
   }
 
+  console.log('[PWAInstallButton] Render state:', { isIOS, isVisible, isInstalled })
+
   // iOS manual install prompt
   if (isIOS) {
+    console.log('[PWAInstallButton] Rendering iOS prompt')
     return (
       <AnimatePresence>
         {isVisible && (
