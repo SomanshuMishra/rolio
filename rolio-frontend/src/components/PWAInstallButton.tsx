@@ -29,7 +29,12 @@ export default function PWAInstallButton() {
     const isIOSDevice = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream
     setIsIOS(isIOSDevice)
 
-    // Listen for install prompt event
+    // For iOS, show the prompt by default (user needs manual instructions)
+    if (isIOSDevice) {
+      setIsVisible(true)
+    }
+
+    // Listen for install prompt event (Android/Web)
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
