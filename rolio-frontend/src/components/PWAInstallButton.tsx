@@ -11,27 +11,23 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function PWAInstallButton() {
+  // Detect iOS early
+  const [isIOS, setIsIOS] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const ua = window.navigator.userAgent
+    return /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream
+  })
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const [isIOS, setIsIOS] = useState(false)
+  const [isVisible, setIsVisible] = useState(isIOS) // Show immediately for iOS
 
   useEffect(() => {
     // Check if app is already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     if (isStandalone || (window.navigator as any).standalone) {
       setIsInstalled(true)
+      setIsVisible(false)
       return
-    }
-
-    // Check if iOS
-    const ua = window.navigator.userAgent
-    const isIOSDevice = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream
-    setIsIOS(isIOSDevice)
-
-    // For iOS, show the prompt by default (user needs manual instructions)
-    if (isIOSDevice) {
-      setIsVisible(true)
     }
 
     // Listen for install prompt event (Android/Web)
