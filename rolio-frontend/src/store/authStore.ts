@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { authAPI } from '@/src/lib/api'
+import { authAPI } from '@/lib/api'
 
 export interface User {
   id: string
@@ -99,7 +99,7 @@ export const useAuthStore = create<AuthState>()(
 
           // Fetch user profile using the new tokens
           try {
-            const { profileAPI } = await import('@/src/lib/api')
+            const { profileAPI } = await import('@/lib/api')
             const profileResponse = await profileAPI.get()
             const userData = profileResponse.data.user
 

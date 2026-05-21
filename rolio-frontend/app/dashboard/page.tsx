@@ -18,7 +18,7 @@ import {
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { jobsAPI, resumeAPI } from "@/src/lib/api"
+import { jobsAPI, resumeAPI } from "@/lib/api"
 import { useAuthStore } from "@/src/store/authStore"
 
 const containerVariants = {

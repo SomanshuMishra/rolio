@@ -21,7 +21,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { profileAPI, resumeAPI, jobsAPI } from "@/src/lib/api"
+import { profileAPI, resumeAPI, jobsAPI } from "@/lib/api"
 import { useAuthStore } from "@/src/store/authStore"
 
 // Hardcoded skill mastery levels (mapped to skill names from resume)
