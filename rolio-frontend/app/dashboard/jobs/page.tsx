@@ -132,8 +132,9 @@ function JobCard({ job, onMutate, refetch }: { job: JobMatch; onMutate?: () => v
 
   // Handle direct apply - opens job URL in new tab
   const handleQuickApply = () => {
-    if (job.apply_url) {
-      window.open(job.apply_url, "_blank")
+    const applyUrl = job.job.apply_url
+    if (applyUrl) {
+      window.open(applyUrl, "_blank")
       toast.success("Opening job application in new tab")
     } else {
       toast.error("Apply link not available for this job")
@@ -239,7 +240,7 @@ function JobCard({ job, onMutate, refetch }: { job: JobMatch; onMutate?: () => v
         <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <Button
             onClick={handleQuickApply}
-            disabled={!job.apply_url}
+            disabled={!job.job.apply_url}
             className="flex-1 h-11 sm:h-auto bg-primary text-primary-foreground hover:bg-primary/90 text-sm sm:text-base"
           >
             <>
@@ -610,7 +611,7 @@ export default function JobsPage() {
         >
           {filteredJobs.map((job, index) => (
             <motion.div
-              key={job.jsearch_id}
+              key={job.jsearch_id || `job-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}

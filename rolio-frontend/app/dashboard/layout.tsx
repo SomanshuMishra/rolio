@@ -40,14 +40,14 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, isAuthenticated, logout } = useAuthStore()
+  const { user, isAuthenticated, logout, isHydrated } = useAuthStore()
 
   useEffect(() => {
-    // Check authentication on mount
-    if (!isAuthenticated) {
+    // Check authentication after store has hydrated
+    if (isHydrated && !isAuthenticated) {
       router.push("/login")
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, isHydrated, router])
 
   const handleLogout = async () => {
     await logout()

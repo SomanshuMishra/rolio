@@ -70,7 +70,8 @@
       "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
       "Bash(cd *)",
       "Bash(node -c app/dashboard/resume/page.tsx)",
-      "Bash(grep -E \"\\\\.\\(md\\)$\")"
+      "Bash(grep -E \"\\\\.\\(md\\)$\")",
+      "Bash(git mv *)"
     ]
   }
 }

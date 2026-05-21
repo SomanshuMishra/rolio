@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuthStore } from "@/src/store/authStore"
+import { FloatingParticles } from "@/src/components/FloatingParticles"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -53,25 +54,7 @@ export default function LoginPage() {
         />
         
         {/* Floating particles */}
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute h-1 w-1 rounded-full bg-primary/40"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -50, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 4 + Math.random() * 3,
-              repeat: Infinity,
-              delay: Math.random() * 3,
-            }}
-          />
-        ))}
+        <FloatingParticles />
       </div>
 
       <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
