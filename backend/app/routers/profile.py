@@ -12,6 +12,7 @@ from ..utils.security import encrypt_api_key, decrypt_api_key, get_api_key_previ
 class UpdateProfileRequest(BaseModel):
     full_name: str = None
     avatar_url: str = None
+    phone_number: str = None
 
 router = APIRouter(prefix="/profile", tags=["profile"])
 logger = logging.getLogger(__name__)
@@ -50,6 +51,8 @@ def get_profile(current_user: User = Depends(get_current_user)):
             "email": current_user.email,
             "full_name": current_user.full_name,
             "avatar_url": current_user.avatar_url,
+            "phone_number": current_user.phone_number,
+            "is_onboarding_complete": current_user.is_onboarding_complete,
             "created_at": current_user.created_at,
             "is_active": current_user.is_active,
         }
@@ -68,6 +71,8 @@ def update_profile(
             current_user.full_name = request.full_name
         if request.avatar_url:
             current_user.avatar_url = request.avatar_url
+        if request.phone_number is not None:
+            current_user.phone_number = request.phone_number
 
         db.commit()
         db.refresh(current_user)
@@ -80,6 +85,8 @@ def update_profile(
                 "email": current_user.email,
                 "full_name": current_user.full_name,
                 "avatar_url": current_user.avatar_url,
+                "phone_number": current_user.phone_number,
+                "is_onboarding_complete": current_user.is_onboarding_complete,
                 "created_at": current_user.created_at,
                 "is_active": current_user.is_active,
             }
@@ -265,6 +272,41 @@ def set_default_api_key(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to set default API key",
+        )
+
+
+@router.post("/complete-onboarding")
+def complete_onboarding(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Mark onboarding as complete for the user."""
+    try:
+        current_user.is_onboarding_complete = True
+        db.commit()
+        db.refresh(current_user)
+
+        logger.info(f"Completed onboarding for user {current_user.id}")
+
+        return {
+            "user": {
+                "id": str(current_user.id),
+                "email": current_user.email,
+                "full_name": current_user.full_name,
+                "avatar_url": current_user.avatar_url,
+                "phone_number": current_user.phone_number,
+                "is_onboarding_complete": current_user.is_onboarding_complete,
+                "created_at": current_user.created_at,
+                "is_active": current_user.is_active,
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Error completing onboarding: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to complete onboarding",
         )
 
 

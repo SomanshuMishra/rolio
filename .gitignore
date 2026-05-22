@@ -79,3 +79,4 @@ logs/
 # Misc
 .cache/
 .turbo/
+./ai-org/

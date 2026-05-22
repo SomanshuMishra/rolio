@@ -166,5 +166,4 @@ export default function PWAInstallButton() {
         )}
       </AnimatePresence>
     )
-  )
 }

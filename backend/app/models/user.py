@@ -22,6 +22,10 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255))
     avatar_url = Column(String(500))
+    phone_number = Column(String(20))
+    is_onboarding_complete = Column(Boolean, default=False, nullable=False)
+    firebase_uid = Column(String(255), unique=True, nullable=True, index=True)
+    auth_provider = Column(String(50), default='email', nullable=False)  # 'email', 'google', etc.
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)

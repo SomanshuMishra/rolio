@@ -20,6 +20,8 @@ class UserResponse(BaseModel):
     email: str
     full_name: str
     avatar_url: Optional[str] = None
+    phone_number: Optional[str] = None
+    is_onboarding_complete: bool = False
     created_at: datetime
     is_active: bool
 
@@ -46,3 +48,7 @@ class RefreshTokenRequest(BaseModel):
 
 class LogoutResponse(BaseModel):
     message: str
+
+
+class GoogleSignInRequest(BaseModel):
+    id_token: str
